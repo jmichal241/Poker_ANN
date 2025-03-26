@@ -22,7 +22,7 @@ void Player::getCard(Card card){
         hand[1]=card;
 }
 void Player::resetRaise(){
-    raise=0;
+    Raise=0;
 }
 void Player::resetHand(){
     hand[0].setNumber(0);
@@ -32,7 +32,7 @@ void Player::resetHand(){
     action=NONE;
 }
 void Player::changeStack(int change){
-    stack = change;
+    stack = stack + change;
 }
 void Player::changeButton(bool change){
     button = change;
@@ -54,4 +54,8 @@ void Player::pass(){
 void Player::raise(int number){
     action=RAISE;
     Raise=Raise + number;
+}
+
+Action Player::getAction(){
+    return action;
 }

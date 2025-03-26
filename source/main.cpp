@@ -10,15 +10,15 @@ int main()
 {
 
     Table table;
-    // table.deal();
-    // table.displayPlayers();
-    // table.smallBlind();
-    // table.bigBlind();
-    // table.displayPlayers(); 
-    // table.passButton();
-    // table.smallBlind();
-    // table.bigBlind();
-    // table.displayPlayers(); 
+    table.deal();
+    table.displayPlayers();
+    table.smallBlind();
+    table.bigBlind();
+    table.displayPlayers(); 
+    table.passButton();
+    table.smallBlind();
+    table.bigBlind();
+    table.displayPlayers(); 
     return 0;
 }
 

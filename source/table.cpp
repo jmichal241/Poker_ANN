@@ -5,7 +5,7 @@
 #define BIG 10
 
 Table::Table(){
-    for (int i = 1; i <= PLAYER; ++i) {
+    for (int i = 0; i < PLAYER; ++i) {
         players.emplace_back(STACK_SIZE);
         players[i].resetHand();
         players[i].changeStack(STACK_SIZE);
@@ -50,17 +50,32 @@ void Table::deal(){
 }
 void Table::smallBlind(){
     int temp = (button + 1) % PLAYER;
-    int money = players[temp].getStack()-SMALL;
-    players[temp].changeStack(money);
+    players[temp].changeStack(-SMALL);
 }
 void Table::bigBlind(){
     int temp = (button + 2) % PLAYER;
-    int money = players[temp].getStack()-BIG;
-    players[temp].changeStack(money);
+    players[temp].changeStack(-BIG);
 }
 void Table::passButton(){
     button = (button + 1) % PLAYER;
 }
+int Table::allActionMade(){
+    int pass=0;
+    int call=0;
+    int check=0;
+    Action action=NONE;
+    for(int i=0; i<PLAYER; i++){
+        if (players[i].getAction()==PASS)
+            pass++;
+        if (players[i].getAction()==CHECK)
+            check++;
+    }
+    if(pass==(PLAYER-1))
+        return 1;               //everyone fold
+    if(check==PLAYER)
+        return 2;               //everyone checked
+
+}       
 void Table::GameLoop(){
     resetboard();
     while(1){
@@ -68,6 +83,10 @@ void Table::GameLoop(){
         smallBlind();
         bigBlind();
         deal();
+        while(allActionMade()==0){
+            // players[button].makeAction();
+            
+        }
         //preflop
 
 
