@@ -8,17 +8,19 @@ using namespace std;
 
 int main()
 {
-
+    // Player player(100);
+    // player.makeAction(100);
     Table table;
-    table.deal();
-    table.displayPlayers();
-    table.smallBlind();
-    table.bigBlind();
-    table.displayPlayers(); 
-    table.passButton();
-    table.smallBlind();
-    table.bigBlind();
-    table.displayPlayers(); 
+    table.GameLoop();
+    // table.deal();
+    // table.displayPlayers();
+    // table.smallBlind();
+    // table.bigBlind();
+    // table.displayPlayers(); 
+    // table.passButton();
+    // table.smallBlind();
+    // table.bigBlind();
+    // table.displayPlayers(); 
     return 0;
 }
 

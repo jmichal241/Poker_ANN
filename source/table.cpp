@@ -8,9 +8,9 @@ Table::Table(){
     for (int i = 0; i < PLAYER; ++i) {
         players.emplace_back(STACK_SIZE);
         players[i].resetHand();
-        players[i].changeStack(STACK_SIZE);
-        players[i].changeButton(0);
+        // players[i].changeButton(0);
     }
+    players[0].changeButton(1);
     deck.shuffle();
 }
 
@@ -40,6 +40,7 @@ void Table::resetboard(){
 }
 void Table::deal(){
     int num;
+    deck.shuffle();
     for(int i=0; i<2;i++){
         for(int j=0; j<PLAYER; j++){
             num = ((j + button) % PLAYER);  // numPlayers is an integer variable
@@ -58,6 +59,10 @@ void Table::bigBlind(){
 }
 void Table::passButton(){
     button = (button + 1) % PLAYER;
+    for(int i=0; i<PLAYER; i++){
+        players[i].changeButton(0);
+    }
+    players[button].changeButton(1);
 }
 int Table::allActionMade(){
     int pass=0;
@@ -74,7 +79,7 @@ int Table::allActionMade(){
         return 1;               //everyone fold
     if(check==PLAYER)
         return 2;               //everyone checked
-
+    return 0;
 }       
 void Table::GameLoop(){
     resetboard();
@@ -82,11 +87,14 @@ void Table::GameLoop(){
         status = PREFLOP;
         smallBlind();
         bigBlind();
+        raise=BIG;
         deal();
+        int counter=0;
         while(allActionMade()==0){
-            // players[button].makeAction();
-            
+            players[(button+counter)%PLAYER].makeAction(raise);
+            counter++;
         }
+        
         //preflop
 
 
@@ -104,7 +112,10 @@ void Table::GameLoop(){
 
 
 
-        // passButton();
+        passButton();
+        for(int i=0; i<PLAYER; i++){
+            players[i].resetHand();
+        }
     }
 
 }
