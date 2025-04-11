@@ -21,11 +21,11 @@ void  Card::display(){
     cout << number << "  " << colourToString(colour) << endl;
 }
 
-int Card::getNumber(){
+int Card::getNumber() const{
     return number;
 }
 
-Colour Card::getColour(){
+Colour Card::getColour() const{
     return colour;
 }
 

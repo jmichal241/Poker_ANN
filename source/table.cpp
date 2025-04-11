@@ -149,29 +149,55 @@ int Table::defineHand(Player player){
     }
     cards[5] = player.returnCard(0);
     cards[6] = player.returnCard(1);
-    for(int i=0; i<7;i++){
-        cards[i].display();
-    }
+
+    std::sort(cards.begin(), cards.end(), [](const Card& a, const Card& b) {
+        return a.getNumber() < b.getNumber();  // Sorting by the card's number (value)
+    });  
+
+
     cout << endl;
-    //royal flush   
-    return 0;
+
+    //count colors
+    int spades=0, clubs=0, hearts=0, diamonds=0;
+    Colour colour;
+    for (int i = 0; i < 7; i++) {
+        colour=cards[i].getColour();
+        if(colour==0)
+            spades++;
+        else if (colour==1)
+            clubs++;
+        else if (colour==2)
+            diamonds++;
+        else
+            hearts++;
+        
+    }
+    bool isStraight=0, isFlash==0;
+    if(spades>=5 || diamonds>=5 || clubs>=5 || hearts>=5)
+        isFlash==1;
+
+    //royal flush
+    
+    return 9;
     //straight flush
-
+    return 8;
     //4 of a kind
-
+    return 7;
     //full house
-
+    return 6;
     //flush
-
+    return 5;
     //straight
-
+    return 4;
     //3 of a kind
-
+    return 3;
     //2 pair
-
+    return 2;
     //a pair
 
+    return 1;
     //high card
-
+    
+    return 0;
 
 }
