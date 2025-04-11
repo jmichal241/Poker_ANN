@@ -90,10 +90,10 @@ void Table::GameLoop(){
         raise=BIG;
         deal();
         int counter=0;
-        while(allActionMade()==0){
-            players[(button+counter)%PLAYER].makeAction(raise);
-            counter++;
-        }
+        // while(allActionMade()==0){
+        //     players[(button+counter)%PLAYER].makeAction(raise);
+        //     counter++;
+        // }
         
         //preflop
 
@@ -109,7 +109,7 @@ void Table::GameLoop(){
         river();
         //showdown
 
-
+        // defineWinner();
 
 
         passButton();
@@ -136,4 +136,30 @@ void Table::displayPlayers(){
 }
 void Table::displayPot(){
     cout << pot << endl;
+}
+
+int Table::defineHand(){
+    vector<Card> cards;
+    for
+    //royal flush
+
+    //straight flush
+
+    //4 of a kind
+
+    //full house
+
+    //flush
+
+    //straight
+
+    //3 of a kind
+
+    //2 pair
+
+    //a pair
+
+    //high card
+
+
 }
