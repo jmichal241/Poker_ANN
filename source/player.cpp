@@ -95,3 +95,11 @@ Action Player::makeAction(int raiseMoney){
     cout << "Po" << action << endl;
     return action;
 }
+
+Card Player::returnCard(int index){
+    if(index==0)
+        return hand[0];
+    
+    else 
+        return hand[1];
+}

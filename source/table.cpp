@@ -12,6 +12,7 @@ Table::Table(){
     }
     players[0].changeButton(1);
     deck.shuffle();
+    players.emplace_back(STACK_SIZE);
 }
 
 void Table::flop(){
@@ -110,12 +111,15 @@ void Table::GameLoop(){
         //showdown
 
         // defineWinner();
-
+        for(int i=0;i<PLAYER;i++){
+            defineHand(players[i]);
+        }
 
         passButton();
         for(int i=0; i<PLAYER; i++){
             players[i].resetHand();
         }
+        break;
     }
 
 }
@@ -138,11 +142,19 @@ void Table::displayPot(){
     cout << pot << endl;
 }
 
-int Table::defineHand(){
-    vector<Card> cards;
-    for
-    //royal flush
-
+int Table::defineHand(Player player){
+    vector<Card> cards(7);
+    for (int i = 0; i < 5; i++) {
+        cards[i] = publicCards[i];
+    }
+    cards[5] = player.returnCard(0);
+    cards[6] = player.returnCard(1);
+    for(int i=0; i<7;i++){
+        cards[i].display();
+    }
+    cout << endl;
+    //royal flush   
+    return 0;
     //straight flush
 
     //4 of a kind
