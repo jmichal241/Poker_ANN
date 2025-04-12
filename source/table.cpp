@@ -111,11 +111,12 @@ void Table::GameLoop(){
         //showdown
 
         // defineWinner();
-        for(int i=0;i<PLAYER;i++){
-            cout << defineHand(players[i]) << endl;;
+        // for(int i=0;i<PLAYER;i++){
+        //     cout << defineHand(players[i]) << endl;;
             
-        }
-        // defineHand(players[0]);
+        // }
+        int winner = defineWinner();
+        cout << "The winner is: " << winner << endl;
 
         passButton();
         for(int i=0; i<PLAYER; i++){
@@ -142,151 +143,93 @@ void Table::displayPlayers(){
 void Table::displayPot(){
     cout << pot << endl;
 }
-
 int Table::defineHand(Player player){
-
-    //Part to make 7 cards
     vector<Card> cards(7);
     for (int i = 0; i < 5; i++) {
         cards[i] = publicCards[i];
     }
     cards[5] = player.returnCard(0);
     cards[6] = player.returnCard(1);
-    //Part to sort them in order of their numbers
+
     std::sort(cards.begin(), cards.end(), [](const Card& a, const Card& b) {
-        return a.getNumber() < b.getNumber();  // Sorting by the card's number (value)
-    });  
-    for(int i=0;i<7;i++){
+        return a.getNumber() < b.getNumber();
+    });
+
+    for (int i = 0; i < 7; i++) {
         cards[i].display();
     }
-    //count colours
-    int spades=0, clubs=0, hearts=0, diamonds=0;
+    cout << endl;
+    // count colours (as before)
+    int spades = 0, clubs = 0, hearts = 0, diamonds = 0;
     Colour colour;
     int flushColour;
     for (int i = 0; i < 7; i++) {
-        colour=cards[i].getColour();
-        if(colour==0)
-            spades++;
-        else if (colour==1)
-            clubs++;
-        else if (colour==2)
-            diamonds++;
-        else
-            hearts++;
+        colour = cards[i].getColour();
+        if (colour == 0) spades++;
+        else if (colour == 1) clubs++;
+        else if (colour == 2) diamonds++;
+        else hearts++;
     }
 
-    bool isStraight=0, isFlush=0;
-
-    //Check flush
-    if(spades>=5){
-        isFlush=1;
-        flushColour=0;
-    }
-    else if(clubs>=5){
-        isFlush=1;
-        flushColour=1;
-    }
-    else if(diamonds>=5){
-        isFlush=1;
-        flushColour=2;
-    }
-    else if(hearts>=5){
-        isFlush=1;
-        flushColour=3;
-    }
-    //Check straight
+    bool isStraight = 0, isFlush = 0;
     int consecutive = 1;
 
+    // Check flush (as before)
+    if (spades >= 5) {
+        isFlush = 1;
+        flushColour = 0;
+    } else if (clubs >= 5) {
+        isFlush = 1;
+        flushColour = 1;
+    } else if (diamonds >= 5) {
+        isFlush = 1;
+        flushColour = 2;
+    } else if (hearts >= 5) {
+        isFlush = 1;
+        flushColour = 3;
+    }
+
+    // Check straight (as before)
     if (cards[0].getNumber() == 2 && cards[6].getNumber() == 14) {
         consecutive++;
     }
-    
+
     for (int i = 1; i < 7; i++) {
         int prev = cards[i - 1].getNumber();
         int curr = cards[i].getNumber();
-    
+
         if (curr == prev + 1) {
             consecutive++;
         } else if (curr != prev) {
             consecutive = 1;
         }
-    
+
         if (consecutive == 5) {
             isStraight = true;
             break;
         }
     }
 
-    //check for 4 of a kind
-    bool isFourOfKind = false;
-    int currentCount = 1;
-
-    for (int i = 1; i < 7; i++) {
-        if (cards[i].getNumber() == cards[i - 1].getNumber()) {
-            currentCount++;
-            if (currentCount == 4) {
-                isFourOfKind = true;
-                break;
-            }
-        } else {
-            currentCount = 1;
-        }
-    }
-    //check for full houses
-    bool isFullHouse = false;
+    bool isFourOfKind = false, isFullHouse = false, isThreeOfKind = false, isTwoPair = false, isOnePair = false;
     int counts[15] = {0}; // Index 2–14 used for card numbers
 
     for (int i = 0; i < 7; i++) {
         counts[cards[i].getNumber()]++;
     }
 
-    bool hasThree = false;
-    bool hasPair = false;
-
-    for (int i = 2; i <= 14; i++) {
-        if (counts[i] >= 3 && !hasThree) {
-            hasThree = true;
-            counts[i] -= 3; // Remove the triple to avoid double-counting it as a pair
-        }
-    }
-
-    for (int i = 2; i <= 14; i++) {
-        if (counts[i] >= 2) {
-            hasPair = true;
-            break;
-        }
-    }
-
-    if (hasThree && hasPair) {
-        isFullHouse = true;
-    }
-
-    //Checking for 3 of a kind, 2 pairs and a pair
-    bool isThreeOfKind = false;
-    bool isTwoPair = false;
-    bool isOnePair = false;
-
     int pairCount = 0;
-
     for (int i = 2; i <= 14; i++) {
-        if (counts[i] == 3) {
-            isThreeOfKind = true;
-        }
-        else if (counts[i] == 2) {
-            pairCount++;
-        }
+        if (counts[i] == 4) isFourOfKind = true;
+        if (counts[i] == 3) isThreeOfKind = true;
+        if (counts[i] == 2) pairCount++;
     }
 
-    if (pairCount >= 2) {
-        isTwoPair = true;
-    }
-    else if (pairCount == 1) {
-        isOnePair = true;
-    }
+    if (pairCount >= 2) isTwoPair = true;
+    if (pairCount == 1) isOnePair = true;
 
-    bool isRoyal=0, isStraightFlush=0;
-    //checking for royal/straight flush
-    if(isFlush){
+    bool isRoyal = 0, isStraightFlush = 0;
+
+    if (isFlush) {
         int count = 1;
         int prev = -1;
         int firstInSequence = -1;
@@ -315,35 +258,81 @@ int Table::defineHand(Player player){
         }
     }
 
-    //royal flush
-    if(isRoyal)
-        return 9;
-    //straight flush
-    else if(isStraightFlush)
-        return 8;
-    //4 of a kind
-    else if(isFourOfKind)
-        return 7;
-    //full house
-    else if(isFullHouse)
-        return 6;
-    //flush
-    else if(isFlush)
-        return 5;
-    //straight
-    else if(isStraight)
-        return 4;
-    //3 of a kind
-    else if(isThreeOfKind)
-        return 3;
-    //2 pair
-    else if(isTwoPair)
-        return 2;
-    //a pair
-    else if(isOnePair)
-        return 1;
-    //high card
-    else
-        return 0;
+    // Return hand rank based on hand type
+    if (isRoyal) return 9;
+    if (isStraightFlush) return 8;
+    if (isFourOfKind) return 7;
+    if (isFullHouse) return 6;
+    if (isFlush) return 5;
+    if (isStraight) return 4;
+    if (isThreeOfKind) return 3;
+    if (isTwoPair) return 2;
+    if (isOnePair) return 1;
 
+    return 0; // High card
+}
+vector<int> Table::getKickers(Player player) {
+    vector<int> kickers;
+    vector<Card> cards(7);
+    for (int i = 0; i < 5; i++) {
+        cards[i] = publicCards[i];
+    }
+    cards[5] = player.returnCard(0);
+    cards[6] = player.returnCard(1);
+    std::sort(cards.begin(), cards.end(), [](const Card& a, const Card& b) {
+        return a.getNumber() < b.getNumber();
+    });
+
+    // Example: For a pair, collect the kicker cards
+    // You may want to add logic here to check for specific hand types and return relevant kickers
+    for (int i = 0; i < 7; i++) {
+        kickers.push_back(cards[i].getNumber());
+    }
+    
+    return kickers;
+}
+
+int Table::defineWinner() {
+    int winner = 0;
+    std::vector<int> winners;  // To handle ties
+    int highestHand = -1;  // Store the highest hand rank
+
+    for (int i = 0; i < PLAYER; i++) {
+        int currentHand = defineHand(players[i]);
+        
+        if (currentHand > highestHand) {
+            highestHand = currentHand;
+            winners.clear();  // New highest hand, reset winner list
+            winners.push_back(i);
+        } else if (currentHand == highestHand) {
+            winners.push_back(i);  // Tie, add this player to the winners list
+        }
+    }
+
+    // If there's more than one winner, handle the tie based on kickers
+    if (winners.size() > 1) {
+        // Now compare kickers of tied players
+        std::vector<int> highestKickers = getKickers(players[winners[0]]);
+        
+        for (int i = 1; i < winners.size(); i++) {
+            std::vector<int> currentKickers = getKickers(players[winners[i]]);
+            
+            if (currentKickers > highestKickers) {
+                // If current kickers are better, update the highest kickers and winner
+                highestKickers = currentKickers;
+                winner = winners[i];
+            } else if (currentKickers == highestKickers) {
+                // If the kickers are also the same, it's still a tie
+                continue;
+            } else {
+                // If the previous winner's kickers are better, keep the current winner
+                continue;
+            }
+        }
+    } else {
+        // No tie, just one winner
+        winner = winners[0];
+    }
+
+    return winner;
 }
