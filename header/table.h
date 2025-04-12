@@ -2,6 +2,8 @@
 #define TABLE_H
 
 #include <algorithm> 
+#include <unordered_map>
+#include <set> 
 #include "player.h"
 
 
@@ -42,8 +44,12 @@ public:
     void passButton();
     int getPot();
     int allActionMade();
+
+    //Methods to define winners
+
     int defineHand(Player);   //check how strong is your hand
-    int defineWinner();//define who wins this hand
+    vector<int> defineWinner();       //define who wins this hand
+    vector<int> getKickers(Player player); //method to get kickers
 
     //funckje pomocnicze
     void displayBoard();

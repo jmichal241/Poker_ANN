@@ -84,7 +84,9 @@ int Table::allActionMade(){
 }       
 void Table::GameLoop(){
     resetboard();
+    int counter2=0;
     while(1){
+        counter2++;
         status = PREFLOP;
         smallBlind();
         bigBlind();
@@ -109,23 +111,26 @@ void Table::GameLoop(){
         status = RIVER;
         river();
         //showdown
-
-        // defineWinner();
         // for(int i=0;i<PLAYER;i++){
-        //     cout << defineHand(players[i]) << endl;;
-            
+        //     if(defineHand(players[i])==6)
+        //         break;
         // }
-        int winner = defineWinner();
-        cout << "The winner is: " << winner << endl;
-
+        // defineHand(players[0]);
+        if(defineHand(players[0])==9){
+            players[0].display();
+            cout << counter2 << endl;
+            break;
+        }
         passButton();
         for(int i=0; i<PLAYER; i++){
             players[i].resetHand();
         }
-    break;
+    // break;
     }
 }
-
+// for(int i=0;i<7;i++){
+//     cards[i].display();
+// }
 void Table::displayBoard(){
     cout << "Board: " << endl;
     for(int i=0; i<5; i++){
@@ -143,7 +148,7 @@ void Table::displayPlayers(){
 void Table::displayPot(){
     cout << pot << endl;
 }
-int Table::defineHand(Player player){
+int Table::defineHand(Player player) {
     vector<Card> cards(7);
     for (int i = 0; i < 5; i++) {
         cards[i] = publicCards[i];
@@ -155,11 +160,10 @@ int Table::defineHand(Player player){
         return a.getNumber() < b.getNumber();
     });
 
-    for (int i = 0; i < 7; i++) {
-        cards[i].display();
-    }
-    cout << endl;
-    // count colours (as before)
+    // Variables to track the best hand
+    vector<Card> bestHand;
+
+    // Count colours
     int spades = 0, clubs = 0, hearts = 0, diamonds = 0;
     Colour colour;
     int flushColour;
@@ -174,7 +178,7 @@ int Table::defineHand(Player player){
     bool isStraight = 0, isFlush = 0;
     int consecutive = 1;
 
-    // Check flush (as before)
+    // Check flush
     if (spades >= 5) {
         isFlush = 1;
         flushColour = 0;
@@ -189,7 +193,7 @@ int Table::defineHand(Player player){
         flushColour = 3;
     }
 
-    // Check straight (as before)
+    // Check straight
     if (cards[0].getNumber() == 2 && cards[6].getNumber() == 14) {
         consecutive++;
     }
@@ -222,6 +226,10 @@ int Table::defineHand(Player player){
         if (counts[i] == 4) isFourOfKind = true;
         if (counts[i] == 3) isThreeOfKind = true;
         if (counts[i] == 2) pairCount++;
+    }
+
+    if (isThreeOfKind && pairCount == 1) {
+        isFullHouse = true;
     }
 
     if (pairCount >= 2) isTwoPair = true;
@@ -258,81 +266,334 @@ int Table::defineHand(Player player){
         }
     }
 
-    // Return hand rank based on hand type
-    if (isRoyal) return 9;
-    if (isStraightFlush) return 8;
-    if (isFourOfKind) return 7;
-    if (isFullHouse) return 6;
-    if (isFlush) return 5;
-    if (isStraight) return 4;
-    if (isThreeOfKind) return 3;
-    if (isTwoPair) return 2;
-    if (isOnePair) return 1;
-
-    return 0; // High card
-}
-vector<int> Table::getKickers(Player player) {
-    vector<int> kickers;
-    vector<Card> cards(7);
-    for (int i = 0; i < 5; i++) {
-        cards[i] = publicCards[i];
-    }
-    cards[5] = player.returnCard(0);
-    cards[6] = player.returnCard(1);
-    std::sort(cards.begin(), cards.end(), [](const Card& a, const Card& b) {
-        return a.getNumber() < b.getNumber();
-    });
-
-    // Example: For a pair, collect the kicker cards
-    // You may want to add logic here to check for specific hand types and return relevant kickers
-    for (int i = 0; i < 7; i++) {
-        kickers.push_back(cards[i].getNumber());
-    }
-    
-    return kickers;
-}
-
-int Table::defineWinner() {
-    int winner = 0;
-    std::vector<int> winners;  // To handle ties
-    int highestHand = -1;  // Store the highest hand rank
-
-    for (int i = 0; i < PLAYER; i++) {
-        int currentHand = defineHand(players[i]);
-        
-        if (currentHand > highestHand) {
-            highestHand = currentHand;
-            winners.clear();  // New highest hand, reset winner list
-            winners.push_back(i);
-        } else if (currentHand == highestHand) {
-            winners.push_back(i);  // Tie, add this player to the winners list
-        }
-    }
-
-    // If there's more than one winner, handle the tie based on kickers
-    if (winners.size() > 1) {
-        // Now compare kickers of tied players
-        std::vector<int> highestKickers = getKickers(players[winners[0]]);
-        
-        for (int i = 1; i < winners.size(); i++) {
-            std::vector<int> currentKickers = getKickers(players[winners[i]]);
-            
-            if (currentKickers > highestKickers) {
-                // If current kickers are better, update the highest kickers and winner
-                highestKickers = currentKickers;
-                winner = winners[i];
-            } else if (currentKickers == highestKickers) {
-                // If the kickers are also the same, it's still a tie
-                continue;
-            } else {
-                // If the previous winner's kickers are better, keep the current winner
-                continue;
+    // Handle Royal Flush and Straight Flush directly
+    if (isRoyal) {
+        for (const auto& card : cards) {
+            if (card.getColour() == flushColour && (card.getNumber() >= 10 && card.getNumber() <= 14)) {
+                bestHand.push_back(card);
             }
         }
-    } else {
-        // No tie, just one winner
-        winner = winners[0];
+        sort(bestHand.begin(), bestHand.end(), [](const Card& a, const Card& b) {
+            return a.getNumber() < b.getNumber();
+        });
+
+        return 9; // Royal Flush
+    } else if (isStraightFlush) {
+        vector<Card> straightFlushCards;
+        for (const auto& card : cards) {
+            if (card.getColour() == flushColour) {
+                straightFlushCards.push_back(card);
+            }
+        }
+        sort(straightFlushCards.begin(), straightFlushCards.end(), [](const Card& a, const Card& b) {
+            return a.getNumber() < b.getNumber();
+        });
+
+        // Check for a consecutive sequence (straight flush)
+        for (int i = 0; i <= straightFlushCards.size() - 5; ++i) {
+            bool isStraight = true;
+            for (int j = i; j < i + 4; ++j) {
+                if (straightFlushCards[j].getNumber() != straightFlushCards[j + 1].getNumber() - 1) {
+                    isStraight = false;
+                    break;
+                }
+            }
+            if (isStraight) {
+                bestHand = vector<Card>(straightFlushCards.begin() + i, straightFlushCards.begin() + i + 5);
+                return 8; // Straight Flush
+            }
+        }
     }
 
-    return winner;
-}
+    // Handle other hand types and select the best 5 cards
+    if (isFourOfKind) {
+        // Find the value of the "Four of a Kind"
+        int fourKindValue = -1;
+        for (int i = 2; i <= 14; i++) {
+            if (counts[i] == 4) {
+                fourKindValue = i;
+                break;
+            }
+        }
+    
+        // Add the four of a kind cards to bestHand
+        for (const auto& card : cards) {
+            if (card.getNumber() == fourKindValue) {
+                bestHand.push_back(card);
+            }
+        }
+    
+        // Find the strongest remaining card (the one that is not part of the four of a kind)
+        Card strongestRemainingCard;
+        bool foundStrongerCard = false;
+    
+        for (const auto& card : cards) {
+            if (card.getNumber() != fourKindValue) {
+                if (!foundStrongerCard || card.getNumber() > strongestRemainingCard.getNumber()) {
+                    strongestRemainingCard = card;
+                    foundStrongerCard = true;
+                }
+            }
+        }
+    
+        // Add the strongest remaining card to the end of the best hand
+        if (foundStrongerCard) {
+            bestHand.push_back(strongestRemainingCard);
+        }
+    
+        // Sort the first 4 cards to arrange them in order (excluding the extra card)
+        sort(bestHand.begin(), bestHand.end() - 1, [](const Card& a, const Card& b) {
+            return a.getNumber() < b.getNumber();
+        });
+    
+        return 7; // Four of a Kind
+    }
+
+    if (isFullHouse) {
+        vector<Card> threeOfAKind, pairCards;
+        for (int i = 2; i <= 14; i++) {
+            if (counts[i] == 3) {
+                for (const auto& card : cards) {
+                    if (card.getNumber() == i) {
+                        threeOfAKind.push_back(card);
+                    }
+                }
+            }
+            if (counts[i] == 2) {
+                for (const auto& card : cards) {
+                    if (card.getNumber() == i) {
+                        pairCards.push_back(card);
+                    }
+                }
+            }
+        }
+        
+        // Ensure we have 3 cards in three of a kind and 2 in pair
+        if (threeOfAKind.size() == 3 && pairCards.size() == 2) {
+            bestHand.insert(bestHand.end(), threeOfAKind.begin(), threeOfAKind.end());
+            bestHand.insert(bestHand.end(), pairCards.begin(), pairCards.end());
+            return 6; // Full House
+        }
+    }
+    
+    else if (isFlush) {
+        vector<Card> flushCards;
+        
+        // Group cards of the same suit
+        for (const auto& card : cards) {
+            if (card.getColour() == cards[0].getColour()) {
+                flushCards.push_back(card);
+            }
+        }
+        
+        // If we have at least 5 cards of the same suit
+        if (flushCards.size() >= 5) {
+            // Sort cards in descending order
+            sort(flushCards.begin(), flushCards.end(), [](const Card& a, const Card& b) {
+                return a.getNumber() > b.getNumber();
+            });
+    
+            // Select the 5 strongest cards
+            bestHand = vector<Card>(flushCards.begin(), flushCards.begin() + 5);
+    
+            return 5; // Flush
+        }
+    }
+    
+    else if (isStraight) {
+        vector<Card> straightCards;
+    
+        // Gather unique card numbers
+        set<int> uniqueNumbers;
+        for (const auto& card : cards) {
+            uniqueNumbers.insert(card.getNumber());
+        }
+    
+        // Convert set to vector
+        for (int num : uniqueNumbers) {
+            straightCards.push_back(Card(num, cards[0].getColour()));
+        }
+    
+        // If we have less than 5 cards in straightCards, we cannot form a straight
+        if (straightCards.size() < 5) {
+            return 0; // No straight
+        }
+    
+        // Sort cards in ascending order
+        sort(straightCards.begin(), straightCards.end(), [](const Card& a, const Card& b) {
+            return a.getNumber() < b.getNumber();
+        });
+    
+        vector<Card> bestStraight;
+    
+        // Check for a valid straight
+        for (int i = 0; i <= straightCards.size() - 5; ++i) {
+            bool validStraight = true;
+            for (int j = i; j < i + 4; ++j) {
+                if (straightCards[j].getNumber() != straightCards[j + 1].getNumber() - 1) {
+                    validStraight = false;
+                    break;
+                }
+            }
+            if (validStraight) {
+                bestStraight = vector<Card>(straightCards.begin() + i, straightCards.begin() + i + 5);
+                break;
+            }
+        }
+    
+        return 4; // Straight
+    }
+    else if (isThreeOfKind) {
+        vector<Card> kickerCards;
+    
+        // Find the three-of-a-kind
+        for (int i = 2; i <= 14; i++) {
+            if (counts[i] == 3) {
+                for (const auto& card : cards) {
+                    if (card.getNumber() == i) {
+                        bestHand.push_back(card); // Add cards to the three-of-a-kind
+                    }
+                }
+                break; // We found the three-of-a-kind, so exit the loop
+            }
+        }
+    
+        // Add the kickers (cards that are not part of the three-of-a-kind)
+        for (const auto& card : cards) {
+            bool isInThreeOfKind = false;
+            // Check if the card is part of the three-of-a-kind
+            for (const auto& threeCard : bestHand) {
+                if (card.getNumber() == threeCard.getNumber() && card.getColour() == threeCard.getColour()) {
+                    isInThreeOfKind = true;
+                    break;
+                }
+            }
+    
+            if (!isInThreeOfKind) {
+                kickerCards.push_back(card);  // Add cards that are not part of the three-of-a-kind
+            }
+        }
+    
+        // Sort kickers in descending order (highest first)
+        sort(kickerCards.begin(), kickerCards.end(), [](const Card& a, const Card& b) {
+            return a.getNumber() > b.getNumber();
+        });
+    
+        // Add the two best kickers (if available)
+        bestHand.push_back(kickerCards[0]);
+        bestHand.push_back(kickerCards[1]);
+    
+        return 3; // Three of a Kind
+    }
+    
+    else if (isTwoPair) {
+        vector<Card> pairCards;
+        vector<Card> kickerCards;
+        vector<int> pairValues; // Store the values of pairs to choose the top 2 pairs
+    
+        // Find two pairs
+        for (int i = 2; i <= 14; i++) {
+            if (counts[i] == 2) {
+                pairValues.push_back(i);  // Add pair value
+                for (const auto& card : cards) {
+                    if (card.getNumber() == i) {
+                        pairCards.push_back(card);  // Add cards to the pair
+                    }
+                }
+            }
+        }
+    
+        // Sort pairs by value (highest pair first)
+        sort(pairValues.begin(), pairValues.end(), greater<int>());
+    
+        // Select the two best pairs
+        vector<Card> bestPairs;
+        for (int i = 0; i < 2; i++) {
+            for (const auto& card : cards) {
+                if (card.getNumber() == pairValues[i]) {
+                    bestPairs.push_back(card);
+                }
+            }
+        }
+    
+        // Add the two best pairs to the hand
+        bestHand.insert(bestHand.end(), bestPairs.begin(), bestPairs.end());
+    
+        // Add kickers (cards not part of the pairs)
+        for (const auto& card : cards) {
+            bool isInPair = false;
+            // Check if the card is part of the best pairs
+            for (const auto& pairCard : bestPairs) {
+                if (card.getNumber() == pairCard.getNumber() && card.getColour() == pairCard.getColour()) {
+                    isInPair = true;
+                    break;
+                }
+            }
+    
+            if (!isInPair) {
+                kickerCards.push_back(card);  // Add cards that are not part of the pairs
+            }
+        }
+    
+        // Sort kickers in descending order (highest first)
+        sort(kickerCards.begin(), kickerCards.end(), [](const Card& a, const Card& b) {
+            return a.getNumber() > b.getNumber();
+        });
+    
+        // Add the best kicker (if available)
+        bestHand.push_back(kickerCards[0]);
+    
+        return 2; // Two Pair
+    }
+    
+    else if (isOnePair) {
+        vector<Card> pairCards;
+        vector<Card> kickerCards;
+        int pairValue = -1;  // Variable to store the pair value
+    
+        // Find the pair value
+        for (int i = 2; i <= 14; i++) {
+            if (counts[i] == 2) {
+                pairValue = i;  // Store pair value
+                for (const auto& card : cards) {
+                    if (card.getNumber() == i) {
+                        pairCards.push_back(card);  // Add cards that form the pair
+                    }
+                }
+            }
+        }
+    
+        // Add kicker cards (all cards that are not part of the pair)
+        for (const auto& card : cards) {
+            if (card.getNumber() != pairValue) {
+                kickerCards.push_back(card);  // Add cards that are not part of the pair
+            }
+        }
+    
+        // Add the pair as the first two cards
+        bestHand.insert(bestHand.end(), pairCards.begin(), pairCards.end());
+    
+        // Sort kickers in descending order (highest first)
+        sort(kickerCards.begin(), kickerCards.end(), [](const Card& a, const Card& b) {
+            return a.getNumber() > b.getNumber();
+        });
+    
+        // Add the three best kickers
+        bestHand.insert(bestHand.end(), kickerCards.begin(), kickerCards.begin() + 3);
+    
+        return 1; // One Pair
+    }
+    
+    // High card case
+    vector<Card> highCardHand;
+    for (const auto& card : cards) {
+        highCardHand.push_back(card);
+    }
+    sort(highCardHand.begin(), highCardHand.end(), [](const Card& a, const Card& b) {
+        return a.getNumber() > b.getNumber();  // Sort in descending order
+    });
+    highCardHand.resize(5); // Only the top 5 cards
+    
+    return 0; // High Card
+    }
+    
