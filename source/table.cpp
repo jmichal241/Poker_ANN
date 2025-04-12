@@ -114,6 +114,7 @@ void Table::GameLoop(){
         for(int i=0;i<PLAYER;i++){
             defineHand(players[i]);
         }
+        // defineHand(players[0]);
 
         passButton();
         for(int i=0; i<PLAYER; i++){
@@ -143,21 +144,22 @@ void Table::displayPot(){
 }
 
 int Table::defineHand(Player player){
+
+    //Part to make 7 cards
     vector<Card> cards(7);
     for (int i = 0; i < 5; i++) {
         cards[i] = publicCards[i];
     }
     cards[5] = player.returnCard(0);
     cards[6] = player.returnCard(1);
-
+    //Part to sort them in order of their numbers
     std::sort(cards.begin(), cards.end(), [](const Card& a, const Card& b) {
         return a.getNumber() < b.getNumber();  // Sorting by the card's number (value)
     });  
 
 
-    cout << endl;
 
-    //count colors
+    //count colours
     int spades=0, clubs=0, hearts=0, diamonds=0;
     Colour colour;
     for (int i = 0; i < 7; i++) {
@@ -170,12 +172,43 @@ int Table::defineHand(Player player){
             diamonds++;
         else
             hearts++;
-        
     }
-    bool isStraight=0, isFlash==0;
+    bool isStraight=0, isFlash=0;
+    //Check flush
     if(spades>=5 || diamonds>=5 || clubs>=5 || hearts>=5)
         isFlash==1;
 
+    //Check straight
+    int straight=1;
+
+
+    if(cards[0].getNumber()==2 && cards[6].getNumber()==14){
+        straight++;
+    }
+    for(int i=1; i<7;i++){
+        // cout << "First card = " << cards[i-1].getNumber() << " Second card = " << cards[i].getNumber() << endl;
+        if(cards[i].getNumber()==cards[i-1].getNumber()+1){
+            // cout << "First card = " << cards[i-1].getNumber() << " Second card = " << cards[i].getNumber() << endl;
+            straight++;
+            
+        }
+        else if(cards[i].getNumber()==cards[i-1].getNumber()){
+            //Do nothing
+        }
+        else    
+            straight=1;
+        if(straight==5){
+            isStraight=1;
+            break;
+        }
+    }
+
+    if(isStraight){
+        for (int i = 0; i < 7; i++) {
+            cards[i].display();
+        }
+        cout << "Cards for straight" << straight << endl;
+    }
     //royal flush
     
     return 9;
