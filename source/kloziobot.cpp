@@ -31,75 +31,84 @@ Action Kloziobot::makeAction(int raiseMoney, int pot, int tableButton) {
     // std::cout << "My hand is: " << endl;
     // hand[0].display();
     // hand[1].display();
-    std::cout << "My strength is: " << handStrength << std::endl;
-    if(handStrength<1&& button!=1){
+    // std::cout << "My strength is: " << handStrength << std::endl;
+    if(stack<=0){
         setAction(PASS);
         return PASS;
     }
-
-    else if(handStrength>=3&&raiseMoney<=10){
+    if(handStrength < 1 && button != 1){
+        setAction(PASS);
+        return PASS;
+    }
+    
+    else if(handStrength >= 3 && raiseMoney <= 10){
         setAction(RAISE);
-        Raise=2*BIG;
+        Raise = std::min(2 * BIG, stack);
         return RAISE;
     }
-    else if(handStrength>=5&&raiseMoney<=10){
+    else if(handStrength >= 5 && raiseMoney <= 10){
         setAction(RAISE);
-        Raise=4*BIG;
+        Raise = std::min(4 * BIG, stack);
         return RAISE;
     }
-    else if(handStrength>=7&&raiseMoney<=10){
+    else if(handStrength >= 7 && raiseMoney <= 10){
         setAction(RAISE);
-        Raise=6*BIG;
+        Raise = std::min(6 * BIG, stack);
         return RAISE;
     }
-    else if (raiseMoney<=10){
+    else if (raiseMoney <= 10){
         setAction(CALL);
         return CALL;
     }
-    if(raiseMoney>=20 && raiseMoney<=40 && handStrength>=3 && handStrength<5){
+    
+    if(raiseMoney >= 20 && raiseMoney <= 40 && handStrength >= 3 && handStrength < 5){
         setAction(CALL);
         return CALL;
     }
-    else if(raiseMoney>=20 && raiseMoney<=40 && handStrength>=5 && handStrength<7){
+    else if(raiseMoney >= 20 && raiseMoney <= 40 && handStrength >= 5 && handStrength < 7){
         setAction(RAISE);
-        Raise=2*raiseMoney;
+        Raise = std::min(2 * raiseMoney, stack);
         return RAISE;
     }
-    else if(raiseMoney>=20 && raiseMoney<=40 && handStrength>=7){
+    else if(raiseMoney >= 20 && raiseMoney <= 40 && handStrength >= 7){
         setAction(RAISE);
-        Raise=4*raiseMoney;
+        Raise = std::min(4 * raiseMoney, stack);
         return RAISE;
     }
     else{
         setAction(PASS);
         return PASS;
     }
-    if(raiseMoney>=40 && raiseMoney<=100 && handStrength>=5){
+    
+    if(raiseMoney >= 40 && raiseMoney <= 100 && handStrength >= 5){
         setAction(CALL);
         return CALL;
     }
-    else if(raiseMoney>=40 && raiseMoney<=100 && handStrength>=8){
+    else if(raiseMoney >= 40 && raiseMoney <= 100 && handStrength >= 8){
         setAction(RAISE);
-        Raise=4*raiseMoney;
+        Raise = std::min(4 * raiseMoney, stack);
         return RAISE;
     }
     else{
         setAction(PASS);
         return PASS;
     }
-    if(raiseMoney>=100 && handStrength>=7 && handStrength<9){
+    
+    if(raiseMoney >= 100 && handStrength >= 7 && handStrength < 9){
         setAction(CALL);
         return CALL;
     }
-    else if(raiseMoney>=100 && handStrength>=9){
+    else if(raiseMoney >= 100 && handStrength >= 9){
         setAction(RAISE);
-        Raise=4*raiseMoney;
+        Raise = std::min(4 * raiseMoney, stack);
         return RAISE;
     }
     else {
         setAction(PASS);
         return PASS;      
     }
+    
     setAction(PASS);
-    return PASS;  
+    return PASS;
+    
 }

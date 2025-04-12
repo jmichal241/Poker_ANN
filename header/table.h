@@ -6,6 +6,9 @@
 #include <set> 
 #include "player.h"
 #include "kloziobot.h"
+#include "GPT1bot.h"
+#include "GPT2bot.h"
+
 
 
 

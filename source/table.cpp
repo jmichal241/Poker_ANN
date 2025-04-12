@@ -1,6 +1,6 @@
 #include "../header/table.h"
 #define STACK_SIZE 1000
-#define PLAYER 5
+#define PLAYER 3
 #define SMALL 5
 #define BIG 10
 
@@ -8,20 +8,14 @@
 Table::Table() {
     players.push_back(new Kloziobot(STACK_SIZE));  // Use pointer to store Kloziobot
     players[0]->resetHand();  // Reset hand for Kloziobot
-    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the second player
+    players.push_back(new GPT1bot(STACK_SIZE));  // Add another Kloziobot as the second player
     players[1]->resetHand();  // Reset hand for the second Kloziobot
-    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players.push_back(new GPT2bot(STACK_SIZE));  // Add another Kloziobot as the third player
     players[2]->resetHand();  // Reset hand for the third Kloziobot
-    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
-    players[3]->resetHand(); 
-    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
-    players[4]->resetHand(); 
-    players[0]->changeButton(1);  // Assign button to the first player (the first Kloziobot)
 
+    players[0]->changeButton(1);  // Assign button to the first player (the first Kloziobot)
     deck.shuffle();  // Shuffle the deck
 }
-
-
 
 void Table::flop(){
     publicCards[0] = deck.draw();
@@ -37,7 +31,6 @@ void Table::river(){
     publicCards[4]= deck.draw();
 }
 
-
 void Table::resetboard(){
     for(int i=0; i<PLAYER; i++){
         players[i]->resetHand();
@@ -47,6 +40,7 @@ void Table::resetboard(){
         publicCards[i].setNumber(0);
     }
 }
+
 void Table::deal(){
     int num;
     deck.shuffle();
@@ -58,16 +52,35 @@ void Table::deal(){
         }
     }
 }
-void Table::smallBlind(){
+
+void Table::smallBlind() {
     int temp = (button + 1) % PLAYER;
-    players[temp]->changeStack(-SMALL);
-    pot+=SMALL;
+
+    // Szukaj gracza z kasą
+    for (int i = 0; i < PLAYER; ++i) {
+        int idx = (temp + i) % PLAYER;
+        if (players[idx]->getStack() > 0) {
+            players[idx]->changeStack(-SMALL);
+            pot += SMALL;
+            break;
+        }
+    }
 }
-void Table::bigBlind(){
+
+void Table::bigBlind() {
     int temp = (button + 2) % PLAYER;
-    players[temp]->changeStack(-BIG);
-    pot+=BIG;
+
+    // Szukaj gracza z kasą
+    for (int i = 0; i < PLAYER; ++i) {
+        int idx = (temp + i) % PLAYER;
+        if (players[idx]->getStack() > 0) {
+            players[idx]->changeStack(-BIG);
+            pot += BIG;
+            break;
+        }
+    }
 }
+
 void Table::passButton(){
     button = (button + 1) % PLAYER;
     for(int i=0; i<PLAYER; i++){
@@ -75,6 +88,7 @@ void Table::passButton(){
     }
     players[button]->changeButton(1);
 }
+
 int Table::allActionMade(){
     int pass = 0;
     int check = 0;
@@ -98,16 +112,18 @@ int Table::allActionMade(){
     if(check + pass== PLAYER) return 2;     // everyone checked
 
     // Everyone has called or there was a raise (round complete)
-    if(call + pass == PLAYER ) return 3; // Everyone called, or a raise occurred
+    if(call + pass + raise== PLAYER ) return 3; // Everyone called, or a raise occurred
 
     return 0;  // Actions are still in progress
 }
        
 void Table::GameLoop(){
     resetboard();
+    int handCounter=0;
     while(1){
         vector<int> winners;
-
+        pot=0;
+        cout << "CHuj" << endl;
         for(int i=0; i<PLAYER; i++){
             players[i]->resetHand();
         }
@@ -137,18 +153,19 @@ void Table::GameLoop(){
                     pot+=raise;
                 }
                 else if(tempAction==CALL){
-                    players[(button + counter) % PLAYER]->changeStack(-raise);
-                    pot+=raise;
+                    if(raise>players[(button + counter) % PLAYER]->getStack()){
+                        players[(button + counter) % PLAYER]->changeStack(-players[(button + counter) % PLAYER]->getStack());
+                        pot+=players[(button + counter) % PLAYER]->getStack();
+                    }
+                    else{
+                        players[(button + counter) % PLAYER]->changeStack(-raise);
+                        pot+=raise;
+                    }
+                    
                 }
-                cout<< "Action is: "<<tempAction << endl;
                 counter++;
             }
         }
-        
-        
-        //preflop
-
-
         //flop
         status = FLOP;
         flop();
@@ -158,21 +175,47 @@ void Table::GameLoop(){
         //river
         status = RIVER;
         river();
-        //showdown
+        // showdown
         // displayBoard();
-        // for(int i=0; i<PLAYER;i++){
-        //     players[i]->display();
-        // }
-        // winners = defineWinner();
-        // std::cout << "Zwycięzcy to gracze: ";
-        // for (int winner : winners) {
-        //     std::cout << "Gracz " << winner << " ";
-        // }
-        // std::cout << std::endl;
+        winners = defineWinner();
+        std::cout << "Zwycięzcy to gracze: ";
+        for (int winner : winners) {
+            std::cout << "Gracz " << winner << " ";
+        }
+        std::cout << std::endl;
+        
+        // Podział pota
+        int share = pot / winners.size();
+        int remainder = pot % winners.size();  // Reszta z dzielenia
+        
+        for (size_t i = 0; i < winners.size(); ++i) {
+            int winnings = share;
+            if (i == 0) winnings += remainder;  // Pierwszy dostaje resztę
+            players[winners[i]]->changeStack(winnings);
+        }
+        
+        std::cout << "Pot (" << pot << ") został podzielony między zwycięzców.\n";
+        displayPlayers();
 
+
+        int playercounter=0;
+        for(int i=0; i<PLAYER;i++){
+            if(players[i]->getStack()<=20)
+            playercounter++;
+        }
+        if(playercounter==4){
+            // displayPlayers();
+            cout << "Hand counter is: " << handCounter << endl;
+            break;
+        }
         passButton();
-        break;
+        if(handCounter==3000){
+            break;
+        }
+        
+        handCounter++;
     }
+    cout << handCounter << endl;
 }
 
 void Table::displayBoard(){
@@ -189,9 +232,11 @@ void Table::displayPlayers(){
         players[i]->display();
     }
 }
+
 void Table::displayPot(){
     cout << pot << endl;
 }
+
 vector<int> Table::defineHand(Player player) {
     vector<Card> cards(7);
     for (int i = 0; i < 5; i++) {
@@ -653,72 +698,74 @@ vector<int> Table::defineHand(Player player) {
     return result;
     }
 
-vector<int> Table::defineWinner() {
-    vector<int> winners;
-    int bestHandValue = -1;  // Najlepsza wartość ręki (np. 1 = para, 2 = trójka, itd.)
-
-    vector<vector<int>> handsResults;
-    for (int i = 0; i < PLAYER; i++) {
-        handsResults.push_back(defineHand(*players[i]));  // Zapisz wyniki rąk graczy
-    }
-
-    // Wyświetl wyniki rąk graczy (ułatwienie debugowania)
-    cout << "Wyniki rąk graczy:" << endl;
-    for (int i = 0; i < PLAYER; i++) {
-        cout << "Gracz " << i + 1 << ": ";
-        for (int card : handsResults[i]) {
-            cout << card << " ";
+    vector<int> Table::defineWinner() {
+        vector<int> winners;
+        int bestHandValue = -1;  // Najlepsza wartość ręki
+    
+        vector<vector<int>> handsResults;
+        for (int i = 0; i < PLAYER; i++) {
+            handsResults.push_back(defineHand(*players[i]));
         }
-        cout << endl;
-    }
-
-    // Porównanie rąk graczy
-    for (int i = 0; i < PLAYER; i++) {
-        vector<int> hand = handsResults[i];
-        int handValue = hand[0];  // Pierwsza wartość to ocena typu ręki (np. 1 = para, 2 = trójka, itd.)
-
-        // Wyświetlanie porównania dla debugowania
-        cout << "Porównuję rękę gracza " << i  << " (Typ: " << handValue << "): ";
-        for (int card : hand) {
-            cout << card << " ";
+    
+        cout << "Wyniki rąk graczy:" << endl;
+        for (int i = 0; i < PLAYER; i++) {
+            cout << "Gracz " << i ;
+            if (players[i]->getAction() == PASS) {
+                cout << " (FOLD)";
+            }
+            cout << ": ";
+            for (int card : handsResults[i]) {
+                cout << card << " ";
+            }
+            cout << endl;
         }
-        cout << endl;
-
-        if (handValue > bestHandValue) {
-            bestHandValue = handValue;
-            winners.clear();  // Wyczyść poprzednich zwycięzców
-            winners.push_back(i);  // Dodaj nowego zwycięzcę
-            cout << "Nowy zwycięzca: Gracz " << i + 1 << endl;
-        } else if (handValue == bestHandValue) {
-            // Jeśli ręka jest taka sama jak najlepsza, porównaj poszczególne karty
-            bool isWinner = false;
-            for (int j = 1; j < hand.size(); j++) {  // Zaczynaj porównywać od drugiego elementu (kart)
-                if (handsResults[i][j] > handsResults[winners[0]][j]) {
-                    isWinner = true;
-                    break;
-                } else if (handsResults[i][j] < handsResults[winners[0]][j]) {
-                    break;
+    
+        for (int i = 0; i < PLAYER; i++) {
+            if (players[i]->getAction() == PASS) continue;  // Pomiń graczy, którzy spasowali
+    
+            vector<int> hand = handsResults[i];
+            int handValue = hand[0];
+    
+            cout << "Porównuję rękę gracza " << i << " (Typ: " << handValue << "): ";
+            for (int card : hand) {
+                cout << card << " ";
+            }
+            cout << endl;
+    
+            if (winners.empty()) {
+                bestHandValue = handValue;
+                winners.push_back(i);
+                cout << "Nowy zwycięzca: Gracz " << i << endl;
+            } else if (handValue > bestHandValue) {
+                bestHandValue = handValue;
+                winners.clear();
+                winners.push_back(i);
+                cout << "Nowy zwycięzca: Gracz " << i << endl;
+            } else if (handValue == bestHandValue) {
+                bool isBetter = false;
+                bool isEqual = true;
+                for (int j = 1; j < hand.size(); j++) {
+                    if (hand[j] > handsResults[winners[0]][j]) {
+                        isBetter = true;
+                        isEqual = false;
+                        break;
+                    } else if (hand[j] < handsResults[winners[0]][j]) {
+                        isEqual = false;
+                        break;
+                    }
+                }
+    
+                if (isBetter) {
+                    winners.clear();
+                    winners.push_back(i);
+                    cout << "Nowy zwycięzca: Gracz " << i << endl;
+                } else if (isEqual) {
+                    winners.push_back(i); // Remis
+                    cout << "Remis! Dodano gracza " << i << " do listy zwycięzców." << endl;
                 }
             }
-
-            if (isWinner) {
-                winners.clear();  // Wyczyszczenie poprzednich zwycięzców, ponieważ mamy nowego
-                winners.push_back(i);
-                cout << "Nowy zwycięzca: Gracz " << i  << " (lepszy kicker)" << endl;
-            } else if (handsResults[i] == handsResults[winners[0]]) {
-                winners.push_back(i);  // Dodaj do zwycięzców, jeśli są równi
-                cout << "Remis z Graczem " << winners[0]  << ": Gracz " << i  << " też wygrywa!" << endl;
-            }
         }
-    }
-
-    // Wyświetl zwycięzców
-    cout << "Zwycięzcy: ";
-    for (int winner : winners) {
-        cout << "Gracz " << winner << " ";
-    }
-    cout << endl;
-
-    return winners;  // Zwróć wektor zwycięzców
-}
     
+        return winners;
+    }
+       
