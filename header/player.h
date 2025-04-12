@@ -6,15 +6,15 @@
 
 enum Action{
     CHECK,
+    CALL,
     PASS,
     RAISE,
-    CALL,
     NONE
 };
 
 class Player{
 private:
-    int stack;    //money
+    int stack=0;    //money
     bool button;  //dealer button
     Card hand[2];   //hand
     int Raise=0;    //raise number
@@ -23,12 +23,14 @@ public:
     Player(int);
     void display();
     void getCard(Card);
-    Action makeAction();
+    Action makeAction(int);
+    Action getAction();
     void resetRaise();
     void resetHand();
     void changeStack(int);
     void changeButton(bool);
     int getStack();
+    Card returnCard(int);
 
     //akcje
     void check();

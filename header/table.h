@@ -1,6 +1,7 @@
 #ifndef TABLE_H
 #define TABLE_H
 
+#include <algorithm> 
 #include "player.h"
 
 
@@ -22,6 +23,7 @@ private:
     GameStatus status;
     int pot;
     int button=0;
+    int raise=0;
     Card publicCards[5];
 public:
     Table();
@@ -39,12 +41,14 @@ public:
     void bigBlind();
     void passButton();
     int getPot();
+    int allActionMade();
+    int defineHand(Player);   //check how strong is your hand
+    int defineWinner();//define who wins this hand
 
     //funckje pomocnicze
     void displayBoard();
     void displayPlayers();
     void displayPot();
-
 };
 
 #endif 

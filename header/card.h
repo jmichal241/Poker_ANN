@@ -21,9 +21,9 @@ public:
     Card() : number(0), colour(SPADE) {}
     Card(int NUMBER, Colour COLOUR);
 
-    int getNumber();
+    int getNumber() const;
     void setNumber(int);
-    Colour getColour();
+    Colour getColour() const;
     void setColour(Colour);
     void display();
 };
