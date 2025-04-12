@@ -4,18 +4,24 @@
 #define SMALL 5
 #define BIG 10
 
-Table::Table(){
-    players.push_back(Kloziobot(STACK_SIZE));  // Add Kloziobot as the first player
-    players[0].resetHand();  // Reset hand for Kloziobot
-    for (int i = 1; i < PLAYER; ++i) {
-        players.emplace_back(STACK_SIZE);
-        players[i].resetHand();
-        // players[i].changeButton(0);
-    }
-    players[0].changeButton(1);
-    deck.shuffle();
-    players.emplace_back(STACK_SIZE);
+// In Table class constructor (table.cpp)
+Table::Table() {
+    players.push_back(new Kloziobot(STACK_SIZE));  // Use pointer to store Kloziobot
+    players[0]->resetHand();  // Reset hand for Kloziobot
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the second player
+    players[1]->resetHand();  // Reset hand for the second Kloziobot
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players[2]->resetHand();  // Reset hand for the third Kloziobot
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players[3]->resetHand(); 
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players[4]->resetHand(); 
+    players[0]->changeButton(1);  // Assign button to the first player (the first Kloziobot)
+
+    deck.shuffle();  // Shuffle the deck
 }
+
+
 
 void Table::flop(){
     publicCards[0] = deck.draw();
@@ -34,7 +40,7 @@ void Table::river(){
 
 void Table::resetboard(){
     for(int i=0; i<PLAYER; i++){
-        players[i].resetHand();
+        players[i]->resetHand();
     }
     pot=0;
     for(int i=0; i<5; i++){
@@ -48,24 +54,26 @@ void Table::deal(){
         for(int j=0; j<PLAYER; j++){
             num = ((j + button) % PLAYER);  // numPlayers is an integer variable
 
-            players[num].getCard(deck.draw());
+            players[num]->getCard(deck.draw());
         }
     }
 }
 void Table::smallBlind(){
     int temp = (button + 1) % PLAYER;
-    players[temp].changeStack(-SMALL);
+    players[temp]->changeStack(-SMALL);
+    pot+=SMALL;
 }
 void Table::bigBlind(){
     int temp = (button + 2) % PLAYER;
-    players[temp].changeStack(-BIG);
+    players[temp]->changeStack(-BIG);
+    pot+=BIG;
 }
 void Table::passButton(){
     button = (button + 1) % PLAYER;
     for(int i=0; i<PLAYER; i++){
-        players[i].changeButton(0);
+        players[i]->changeButton(0);
     }
-    players[button].changeButton(1);
+    players[button]->changeButton(1);
 }
 int Table::allActionMade(){
     int pass = 0;
@@ -75,7 +83,7 @@ int Table::allActionMade(){
     Action action = NONE;
 
     for(int i = 0; i < PLAYER; i++){
-        action = players[i].getAction();
+        action = players[i]->getAction();
 
         if(action == PASS) pass++;
         if(action == CHECK) check++;
@@ -84,13 +92,13 @@ int Table::allActionMade(){
     }
 
     // Everyone folded (only pass left)
-    if(pass == PLAYER - 1) return 1;  // everyone folded
+    if(pass == PLAYER-1) return 1;  // everyone folded
 
     // Everyone checked (no one raised or called)
-    if(check == PLAYER) return 2;     // everyone checked
+    if(check + pass== PLAYER) return 2;     // everyone checked
 
     // Everyone has called or there was a raise (round complete)
-    if(call == PLAYER - 1 || raise > 0) return 3; // Everyone called, or a raise occurred
+    if(call + pass == PLAYER ) return 3; // Everyone called, or a raise occurred
 
     return 0;  // Actions are still in progress
 }
@@ -100,16 +108,43 @@ void Table::GameLoop(){
     while(1){
         vector<int> winners;
 
+        for(int i=0; i<PLAYER; i++){
+            players[i]->resetHand();
+        }
+
         status = PREFLOP;
         smallBlind();
         bigBlind();
         raise=BIG;
         deal();
-        int counter=0;
-        // while(allActionMade()==0){
-        //     players[(button+counter)%PLAYER].makeAction(raise);
-        //     counter++;
-        // }
+        int counter=button+1;
+        Action tempAction;
+        while (allActionMade() == 0) {
+            if(players[(button + counter) % PLAYER]->getAction()==RAISE && players[(button + counter) % PLAYER]->getRaise()==raise){
+                break;
+            }
+            tempAction=(players[(button + counter) % PLAYER]->makeAction(raise, pot, button));
+            if(tempAction==PASS){
+                cout << "Player: " << (button + counter) % PLAYER << " Folded" << endl;
+                counter++;
+            }
+            else
+            {
+                if(tempAction==RAISE){
+                    raise=players[(button + counter) % PLAYER]->getRaise();
+                    players[(button + counter) % PLAYER]->changeStack(-raise);
+                    cout<< "Raise is: "<<raise << endl;
+                    pot+=raise;
+                }
+                else if(tempAction==CALL){
+                    players[(button + counter) % PLAYER]->changeStack(-raise);
+                    pot+=raise;
+                }
+                cout<< "Action is: "<<tempAction << endl;
+                counter++;
+            }
+        }
+        
         
         //preflop
 
@@ -124,22 +159,19 @@ void Table::GameLoop(){
         status = RIVER;
         river();
         //showdown
-        displayBoard();
-        for(int i=0; i<PLAYER;i++){
-            players[i].display();
-        }
-        winners = defineWinner();
-        std::cout << "Zwycięzcy to gracze: ";
-        for (int winner : winners) {
-            std::cout << "Gracz " << winner << " ";
-        }
-        std::cout << std::endl;
+        // displayBoard();
+        // for(int i=0; i<PLAYER;i++){
+        //     players[i]->display();
+        // }
+        // winners = defineWinner();
+        // std::cout << "Zwycięzcy to gracze: ";
+        // for (int winner : winners) {
+        //     std::cout << "Gracz " << winner << " ";
+        // }
+        // std::cout << std::endl;
 
         passButton();
-        for(int i=0; i<PLAYER; i++){
-            players[i].resetHand();
-        }
-    break;
+        break;
     }
 }
 
@@ -154,7 +186,7 @@ void Table::displayBoard(){
 
 void Table::displayPlayers(){
     for(int i=0; i<PLAYER; i++){
-        players[i].display();
+        players[i]->display();
     }
 }
 void Table::displayPot(){
@@ -627,7 +659,7 @@ vector<int> Table::defineWinner() {
 
     vector<vector<int>> handsResults;
     for (int i = 0; i < PLAYER; i++) {
-        handsResults.push_back(defineHand(players[i]));  // Zapisz wyniki rąk graczy
+        handsResults.push_back(defineHand(*players[i]));  // Zapisz wyniki rąk graczy
     }
 
     // Wyświetl wyniki rąk graczy (ułatwienie debugowania)

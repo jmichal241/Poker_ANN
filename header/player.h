@@ -25,9 +25,11 @@ public:
     void getCard(Card);
 
 
-    virtual Action makeAction(int,int,int);
+    virtual Action makeAction(int raiseMoney, int pot, int button);
 
+    void setAction(Action);
     Action getAction();
+    int getRaise();
     void resetRaise();
     void resetHand();
     void changeStack(int);
@@ -40,8 +42,6 @@ public:
     void pass();
     void raise(int);
     void call();
-    //boty
-    void alwaysCall();
 };
 
 

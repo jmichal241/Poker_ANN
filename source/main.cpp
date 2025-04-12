@@ -8,6 +8,9 @@ using namespace std;
 
 int main()
 {
+    // Kloziobot player(1000);  // Create a stack-allocated Kloziobot object
+    // player.makeAction(100, 500, 1);  // Calls makeAction on the Kloziobot object (direct call)
+    
     // Player player(100);
     // Kloziobot bot1(100);
     // player.makeAction(100);

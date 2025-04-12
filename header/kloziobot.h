@@ -7,7 +7,9 @@ class Kloziobot : public Player {
 public:
     Kloziobot(int initialStack);
 
-    Action makeAction(int,int,int) override;
+    // Kloziobot class
+    Action makeAction(int raiseMoney, int pot, int tableButton);
+
 };
 
 #endif

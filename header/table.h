@@ -22,7 +22,7 @@ enum GameStatus {
 class Table{
 private:
     Deck deck;
-    vector<Player> players;
+    std::vector<Player*> players;
     GameStatus status;
     int pot;
     int button=0;

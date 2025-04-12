@@ -1,9 +1,8 @@
 #include "../header/player.h"
 
-Player::Player(int Stack){
-    stack = Stack;
-    button=0;
-    // cout << stack << endl;
+// In Player class
+Player::Player(int initialStack) : stack(initialStack), action(NONE) {
+    // other initializations if needed
 }
 
 void Player::display(){
@@ -59,40 +58,44 @@ void Player::raise(int number){
 Action Player::getAction(){
     return action;
 }
+void Player::setAction(Action action) {
+    this->action = action; // Set the player's action
+}
+
 Action Player::makeAction(int raiseMoney, int pot, int button){
-    int x=0;
+    // int x=0;
     cout << "Przed" << action << endl;
-    while(true){
-        cout << "Give number from 0 - 3" << endl;
-        cout << "Option 0 - Check" << endl;
-        cout << "Option 1 - Call" << endl;
-        cout << "Option 2 - Fold" << endl;
-        cout << "Option 3 - Raise" << endl;
-        cin >> x;
+    // while(true){
+    //     cout << "Give number from 0 - 3" << endl;
+    //     cout << "Option 0 - Check" << endl;
+    //     cout << "Option 1 - Call" << endl;
+    //     cout << "Option 2 - Fold" << endl;
+    //     cout << "Option 3 - Raise" << endl;
+    //     cin >> x;
         
-        if(x>=0 && x<4){
-            cout << "Correct number" << endl;
-            if(x==0){
-                action=CHECK;
-            }
-            else if(x==1){
-                action=CALL;
-            }
-            else if(x==2){
-                action=PASS;
-            }
-            else{
-                action=RAISE;
-                cout << "Give raise amount" << endl;
-                cin >> Raise;
-            }
-            break;
-        }
-        else {
-            cout << "Wrong data, try again" << endl;
-        }
-    }
-    cout << "Po" << action << endl;
+    //     if(x>=0 && x<4){
+    //         cout << "Correct number" << endl;
+    //         if(x==0){
+    //             action=CHECK;
+    //         }
+    //         else if(x==1){
+    //             action=CALL;
+    //         }
+    //         else if(x==2){
+    //             action=PASS;
+    //         }
+    //         else{
+    //             action=RAISE;
+    //             cout << "Give raise amount" << endl;
+    //             cin >> Raise;
+    //         }
+    //         break;
+    //     }
+    //     else {
+    //         cout << "Wrong data, try again" << endl;
+    //     }
+    // }
+    // cout << "Po" << action << endl;
     return action;
 }
 
@@ -102,4 +105,8 @@ Card Player::returnCard(int index){
     
     else 
         return hand[1];
+}
+
+int Player::getRaise(){
+    return Raise;
 }
