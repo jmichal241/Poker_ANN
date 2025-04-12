@@ -47,7 +47,7 @@ public:
 
     //Methods to define winners
 
-    int defineHand(Player);   //check how strong is your hand
+    vector<int> defineHand(Player);   //check how strong is your hand
     vector<int> defineWinner();       //define who wins this hand
     vector<int> getKickers(Player player); //method to get kickers
 
