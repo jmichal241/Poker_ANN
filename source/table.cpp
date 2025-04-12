@@ -112,7 +112,8 @@ void Table::GameLoop(){
 
         // defineWinner();
         for(int i=0;i<PLAYER;i++){
-            defineHand(players[i]);
+            cout << defineHand(players[i]) << endl;;
+            
         }
         // defineHand(players[0]);
 
@@ -120,7 +121,7 @@ void Table::GameLoop(){
         for(int i=0; i<PLAYER; i++){
             players[i].resetHand();
         }
-    // break;
+    break;
     }
 }
 
@@ -155,9 +156,9 @@ int Table::defineHand(Player player){
     std::sort(cards.begin(), cards.end(), [](const Card& a, const Card& b) {
         return a.getNumber() < b.getNumber();  // Sorting by the card's number (value)
     });  
-
-
-
+    for(int i=0;i<7;i++){
+        cards[i].display();
+    }
     //count colours
     int spades=0, clubs=0, hearts=0, diamonds=0;
     Colour colour;
@@ -216,7 +217,7 @@ int Table::defineHand(Player player){
         }
     }
 
-    //check 4 of a kind
+    //check for 4 of a kind
     bool isFourOfKind = false;
     int currentCount = 1;
 
@@ -230,6 +231,57 @@ int Table::defineHand(Player player){
         } else {
             currentCount = 1;
         }
+    }
+    //check for full houses
+    bool isFullHouse = false;
+    int counts[15] = {0}; // Index 2–14 used for card numbers
+
+    for (int i = 0; i < 7; i++) {
+        counts[cards[i].getNumber()]++;
+    }
+
+    bool hasThree = false;
+    bool hasPair = false;
+
+    for (int i = 2; i <= 14; i++) {
+        if (counts[i] >= 3 && !hasThree) {
+            hasThree = true;
+            counts[i] -= 3; // Remove the triple to avoid double-counting it as a pair
+        }
+    }
+
+    for (int i = 2; i <= 14; i++) {
+        if (counts[i] >= 2) {
+            hasPair = true;
+            break;
+        }
+    }
+
+    if (hasThree && hasPair) {
+        isFullHouse = true;
+    }
+
+    //Checking for 3 of a kind, 2 pairs and a pair
+    bool isThreeOfKind = false;
+    bool isTwoPair = false;
+    bool isOnePair = false;
+
+    int pairCount = 0;
+
+    for (int i = 2; i <= 14; i++) {
+        if (counts[i] == 3) {
+            isThreeOfKind = true;
+        }
+        else if (counts[i] == 2) {
+            pairCount++;
+        }
+    }
+
+    if (pairCount >= 2) {
+        isTwoPair = true;
+    }
+    else if (pairCount == 1) {
+        isOnePair = true;
     }
 
     bool isRoyal=0, isStraightFlush=0;
@@ -262,18 +314,7 @@ int Table::defineHand(Player player){
             }
         }
     }
-    if(isRoyal){
-        cout << "Royal" << endl;
-        for(int i=0; i<7;i++){
-            cards[i].display();
-        }
-    }
-    if(isStraightFlush){
-        cout << "Straight flush" << endl;
-        for(int i=0; i<7;i++){
-            cards[i].display();
-        }
-    }
+
     //royal flush
     if(isRoyal)
         return 9;
@@ -281,15 +322,11 @@ int Table::defineHand(Player player){
     else if(isStraightFlush)
         return 8;
     //4 of a kind
-    else if(isFourOfKind){
-        cout << "4 of a kind" << endl;
-        for(int i=0; i<7;i++){
-            cards[i].display();
-        }
+    else if(isFourOfKind)
         return 7;
-    }
     //full house
-    // return 6;
+    else if(isFullHouse)
+        return 6;
     //flush
     else if(isFlush)
         return 5;
@@ -297,14 +334,16 @@ int Table::defineHand(Player player){
     else if(isStraight)
         return 4;
     //3 of a kind
-    // return 3;
+    else if(isThreeOfKind)
+        return 3;
     //2 pair
-    // return 2;
+    else if(isTwoPair)
+        return 2;
     //a pair
-
-    // return 1;
+    else if(isOnePair)
+        return 1;
     //high card
-    
-    return 0;
+    else
+        return 0;
 
 }
