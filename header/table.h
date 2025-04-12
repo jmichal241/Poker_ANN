@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <set> 
 #include "player.h"
+#include "kloziobot.h"
 
 
 
@@ -32,26 +33,29 @@ public:
     void GameLoop();
     void resetboard();
     
-    //operacje na karciochach
-    void deal();        //rozdanie kart
+    //Cards operations
+    void deal();        //Cards for players
     void flop();        //flop cards show
     void turn();        //turn card show
     void river();       //river card show
     void showdown();    //card showdown, 
 
+    //Game organizing staff
     void smallBlind();
     void bigBlind();
     void passButton();
-    int getPot();
     int allActionMade();
 
-    //Methods to define winners
+    //Methods for players
+    int getPot();
+    int getRaise();
+    int getButton();
 
+    //Methods to define winners
     vector<int> defineHand(Player);   //check how strong is your hand
     vector<int> defineWinner();       //define who wins this hand
-    vector<int> getKickers(Player player); //method to get kickers
 
-    //funckje pomocnicze
+    //Debug functions
     void displayBoard();
     void displayPlayers();
     void displayPot();

@@ -13,7 +13,7 @@ enum Action{
 };
 
 class Player{
-private:
+protected:
     int stack=0;    //money
     bool button;  //dealer button
     Card hand[2];   //hand
@@ -23,7 +23,10 @@ public:
     Player(int);
     void display();
     void getCard(Card);
-    Action makeAction(int);
+
+
+    virtual Action makeAction(int,int,int);
+
     Action getAction();
     void resetRaise();
     void resetHand();

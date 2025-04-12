@@ -9,6 +9,7 @@ using namespace std;
 int main()
 {
     // Player player(100);
+    // Kloziobot bot1(100);
     // player.makeAction(100);
     Table table;
     table.GameLoop();

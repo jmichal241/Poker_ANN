@@ -5,7 +5,9 @@
 #define BIG 10
 
 Table::Table(){
-    for (int i = 0; i < PLAYER; ++i) {
+    players.push_back(Kloziobot(STACK_SIZE));  // Add Kloziobot as the first player
+    players[0].resetHand();  // Reset hand for Kloziobot
+    for (int i = 1; i < PLAYER; ++i) {
         players.emplace_back(STACK_SIZE);
         players[i].resetHand();
         // players[i].changeButton(0);
@@ -66,22 +68,33 @@ void Table::passButton(){
     players[button].changeButton(1);
 }
 int Table::allActionMade(){
-    int pass=0;
-    int call=0;
-    int check=0;
-    Action action=NONE;
-    for(int i=0; i<PLAYER; i++){
-        if (players[i].getAction()==PASS)
-            pass++;
-        if (players[i].getAction()==CHECK)
-            check++;
+    int pass = 0;
+    int check = 0;
+    int call = 0;
+    int raise = 0;
+    Action action = NONE;
+
+    for(int i = 0; i < PLAYER; i++){
+        action = players[i].getAction();
+
+        if(action == PASS) pass++;
+        if(action == CHECK) check++;
+        if(action == CALL) call++;
+        if(action == RAISE) raise++;
     }
-    if(pass==(PLAYER-1))
-        return 1;               //everyone fold
-    if(check==PLAYER)
-        return 2;               //everyone checked
-    return 0;
-}       
+
+    // Everyone folded (only pass left)
+    if(pass == PLAYER - 1) return 1;  // everyone folded
+
+    // Everyone checked (no one raised or called)
+    if(check == PLAYER) return 2;     // everyone checked
+
+    // Everyone has called or there was a raise (round complete)
+    if(call == PLAYER - 1 || raise > 0) return 3; // Everyone called, or a raise occurred
+
+    return 0;  // Actions are still in progress
+}
+       
 void Table::GameLoop(){
     resetboard();
     while(1){
@@ -129,9 +142,7 @@ void Table::GameLoop(){
     break;
     }
 }
-// for(int i=0;i<7;i++){
-//     cards[i].display();
-// }
+
 void Table::displayBoard(){
     cout << "Board: " << endl;
     for(int i=0; i<5; i++){
@@ -610,72 +621,72 @@ vector<int> Table::defineHand(Player player) {
     return result;
     }
 
-    vector<int> Table::defineWinner() {
-        vector<int> winners;
-        int bestHandValue = -1;  // Najlepsza wartość ręki (np. 1 = para, 2 = trójka, itd.)
-    
-        vector<vector<int>> handsResults;
-        for (int i = 0; i < PLAYER; i++) {
-            handsResults.push_back(defineHand(players[i]));  // Zapisz wyniki rąk graczy
-        }
-    
-        // Wyświetl wyniki rąk graczy (ułatwienie debugowania)
-        cout << "Wyniki rąk graczy:" << endl;
-        for (int i = 0; i < PLAYER; i++) {
-            cout << "Gracz " << i + 1 << ": ";
-            for (int card : handsResults[i]) {
-                cout << card << " ";
-            }
-            cout << endl;
-        }
-    
-        // Porównanie rąk graczy
-        for (int i = 0; i < PLAYER; i++) {
-            vector<int> hand = handsResults[i];
-            int handValue = hand[0];  // Pierwsza wartość to ocena typu ręki (np. 1 = para, 2 = trójka, itd.)
-    
-            // Wyświetlanie porównania dla debugowania
-            cout << "Porównuję rękę gracza " << i  << " (Typ: " << handValue << "): ";
-            for (int card : hand) {
-                cout << card << " ";
-            }
-            cout << endl;
-    
-            if (handValue > bestHandValue) {
-                bestHandValue = handValue;
-                winners.clear();  // Wyczyść poprzednich zwycięzców
-                winners.push_back(i);  // Dodaj nowego zwycięzcę
-                cout << "Nowy zwycięzca: Gracz " << i + 1 << endl;
-            } else if (handValue == bestHandValue) {
-                // Jeśli ręka jest taka sama jak najlepsza, porównaj poszczególne karty
-                bool isWinner = false;
-                for (int j = 1; j < hand.size(); j++) {  // Zaczynaj porównywać od drugiego elementu (kart)
-                    if (handsResults[i][j] > handsResults[winners[0]][j]) {
-                        isWinner = true;
-                        break;
-                    } else if (handsResults[i][j] < handsResults[winners[0]][j]) {
-                        break;
-                    }
-                }
-    
-                if (isWinner) {
-                    winners.clear();  // Wyczyszczenie poprzednich zwycięzców, ponieważ mamy nowego
-                    winners.push_back(i);
-                    cout << "Nowy zwycięzca: Gracz " << i  << " (lepszy kicker)" << endl;
-                } else if (handsResults[i] == handsResults[winners[0]]) {
-                    winners.push_back(i);  // Dodaj do zwycięzców, jeśli są równi
-                    cout << "Remis z Graczem " << winners[0]  << ": Gracz " << i  << " też wygrywa!" << endl;
-                }
-            }
-        }
-    
-        // Wyświetl zwycięzców
-        cout << "Zwycięzcy: ";
-        for (int winner : winners) {
-            cout << "Gracz " << winner << " ";
+vector<int> Table::defineWinner() {
+    vector<int> winners;
+    int bestHandValue = -1;  // Najlepsza wartość ręki (np. 1 = para, 2 = trójka, itd.)
+
+    vector<vector<int>> handsResults;
+    for (int i = 0; i < PLAYER; i++) {
+        handsResults.push_back(defineHand(players[i]));  // Zapisz wyniki rąk graczy
+    }
+
+    // Wyświetl wyniki rąk graczy (ułatwienie debugowania)
+    cout << "Wyniki rąk graczy:" << endl;
+    for (int i = 0; i < PLAYER; i++) {
+        cout << "Gracz " << i + 1 << ": ";
+        for (int card : handsResults[i]) {
+            cout << card << " ";
         }
         cout << endl;
-    
-        return winners;  // Zwróć wektor zwycięzców
     }
+
+    // Porównanie rąk graczy
+    for (int i = 0; i < PLAYER; i++) {
+        vector<int> hand = handsResults[i];
+        int handValue = hand[0];  // Pierwsza wartość to ocena typu ręki (np. 1 = para, 2 = trójka, itd.)
+
+        // Wyświetlanie porównania dla debugowania
+        cout << "Porównuję rękę gracza " << i  << " (Typ: " << handValue << "): ";
+        for (int card : hand) {
+            cout << card << " ";
+        }
+        cout << endl;
+
+        if (handValue > bestHandValue) {
+            bestHandValue = handValue;
+            winners.clear();  // Wyczyść poprzednich zwycięzców
+            winners.push_back(i);  // Dodaj nowego zwycięzcę
+            cout << "Nowy zwycięzca: Gracz " << i + 1 << endl;
+        } else if (handValue == bestHandValue) {
+            // Jeśli ręka jest taka sama jak najlepsza, porównaj poszczególne karty
+            bool isWinner = false;
+            for (int j = 1; j < hand.size(); j++) {  // Zaczynaj porównywać od drugiego elementu (kart)
+                if (handsResults[i][j] > handsResults[winners[0]][j]) {
+                    isWinner = true;
+                    break;
+                } else if (handsResults[i][j] < handsResults[winners[0]][j]) {
+                    break;
+                }
+            }
+
+            if (isWinner) {
+                winners.clear();  // Wyczyszczenie poprzednich zwycięzców, ponieważ mamy nowego
+                winners.push_back(i);
+                cout << "Nowy zwycięzca: Gracz " << i  << " (lepszy kicker)" << endl;
+            } else if (handsResults[i] == handsResults[winners[0]]) {
+                winners.push_back(i);  // Dodaj do zwycięzców, jeśli są równi
+                cout << "Remis z Graczem " << winners[0]  << ": Gracz " << i  << " też wygrywa!" << endl;
+            }
+        }
+    }
+
+    // Wyświetl zwycięzców
+    cout << "Zwycięzcy: ";
+    for (int winner : winners) {
+        cout << "Gracz " << winner << " ";
+    }
+    cout << endl;
+
+    return winners;  // Zwróć wektor zwycięzców
+}
     

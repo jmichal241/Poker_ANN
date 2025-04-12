@@ -59,7 +59,7 @@ void Player::raise(int number){
 Action Player::getAction(){
     return action;
 }
-Action Player::makeAction(int raiseMoney){
+Action Player::makeAction(int raiseMoney, int pot, int button){
     int x=0;
     cout << "Przed" << action << endl;
     while(true){
