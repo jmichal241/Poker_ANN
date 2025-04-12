@@ -120,9 +120,8 @@ void Table::GameLoop(){
         for(int i=0; i<PLAYER; i++){
             players[i].resetHand();
         }
-        break;
+    // break;
     }
-
 }
 
 void Table::displayBoard(){
@@ -162,6 +161,7 @@ int Table::defineHand(Player player){
     //count colours
     int spades=0, clubs=0, hearts=0, diamonds=0;
     Colour colour;
+    int flushColour;
     for (int i = 0; i < 7; i++) {
         colour=cards[i].getColour();
         if(colour==0)
@@ -173,62 +173,136 @@ int Table::defineHand(Player player){
         else
             hearts++;
     }
-    bool isStraight=0, isFlash=0;
+
+    bool isStraight=0, isFlush=0;
+
     //Check flush
-    if(spades>=5 || diamonds>=5 || clubs>=5 || hearts>=5)
-        isFlash==1;
-
-    //Check straight
-    int straight=1;
-
-
-    if(cards[0].getNumber()==2 && cards[6].getNumber()==14){
-        straight++;
+    if(spades>=5){
+        isFlush=1;
+        flushColour=0;
     }
-    for(int i=1; i<7;i++){
-        // cout << "First card = " << cards[i-1].getNumber() << " Second card = " << cards[i].getNumber() << endl;
-        if(cards[i].getNumber()==cards[i-1].getNumber()+1){
-            // cout << "First card = " << cards[i-1].getNumber() << " Second card = " << cards[i].getNumber() << endl;
-            straight++;
-            
+    else if(clubs>=5){
+        isFlush=1;
+        flushColour=1;
+    }
+    else if(diamonds>=5){
+        isFlush=1;
+        flushColour=2;
+    }
+    else if(hearts>=5){
+        isFlush=1;
+        flushColour=3;
+    }
+    //Check straight
+    int consecutive = 1;
+
+    if (cards[0].getNumber() == 2 && cards[6].getNumber() == 14) {
+        consecutive++;
+    }
+    
+    for (int i = 1; i < 7; i++) {
+        int prev = cards[i - 1].getNumber();
+        int curr = cards[i].getNumber();
+    
+        if (curr == prev + 1) {
+            consecutive++;
+        } else if (curr != prev) {
+            consecutive = 1;
         }
-        else if(cards[i].getNumber()==cards[i-1].getNumber()){
-            //Do nothing
-        }
-        else    
-            straight=1;
-        if(straight==5){
-            isStraight=1;
+    
+        if (consecutive == 5) {
+            isStraight = true;
             break;
         }
     }
 
-    if(isStraight){
+    //check 4 of a kind
+    bool isFourOfKind = false;
+    int currentCount = 1;
+
+    for (int i = 1; i < 7; i++) {
+        if (cards[i].getNumber() == cards[i - 1].getNumber()) {
+            currentCount++;
+            if (currentCount == 4) {
+                isFourOfKind = true;
+                break;
+            }
+        } else {
+            currentCount = 1;
+        }
+    }
+
+    bool isRoyal=0, isStraightFlush=0;
+    //checking for royal/straight flush
+    if(isFlush){
+        int count = 1;
+        int prev = -1;
+        int firstInSequence = -1;
+
         for (int i = 0; i < 7; i++) {
+            if (cards[i].getColour() == flushColour) {
+                if (prev == -1) {
+                    count = 1;
+                    firstInSequence = cards[i].getNumber();
+                } else if (cards[i].getNumber() == prev + 1) {
+                    count++;
+                } else if (cards[i].getNumber() != prev) {
+                    count = 1;
+                    firstInSequence = cards[i].getNumber();
+                }
+                prev = cards[i].getNumber();
+            }
+
+            if (count == 5) {
+                isStraightFlush = true;
+                if (prev == 14 && firstInSequence == 10) {
+                    isRoyal = true;
+                }
+                break;
+            }
+        }
+    }
+    if(isRoyal){
+        cout << "Royal" << endl;
+        for(int i=0; i<7;i++){
             cards[i].display();
         }
-        cout << "Cards for straight" << straight << endl;
+    }
+    if(isStraightFlush){
+        cout << "Straight flush" << endl;
+        for(int i=0; i<7;i++){
+            cards[i].display();
+        }
     }
     //royal flush
-    
-    return 9;
+    if(isRoyal)
+        return 9;
     //straight flush
-    return 8;
+    else if(isStraightFlush)
+        return 8;
     //4 of a kind
-    return 7;
+    else if(isFourOfKind){
+        cout << "4 of a kind" << endl;
+        for(int i=0; i<7;i++){
+            cards[i].display();
+        }
+        return 7;
+    }
     //full house
-    return 6;
+    // return 6;
     //flush
-    return 5;
+    else if(isFlush)
+        return 5;
     //straight
-    return 4;
+    else if(isStraight)
+        return 4;
     //3 of a kind
-    return 3;
+    // return 3;
     //2 pair
-    return 2;
+    // return 2;
     //a pair
 
-    return 1;
+    // return 1;
     //high card
     
     return 0;
