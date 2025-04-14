@@ -126,13 +126,19 @@ void Table::GameLoop() {
     while (true) {
         vector<int> winners;
         pot = 0;
-        // cout << "Starting hand..." << endl;
+        createHeader(handCounter);
 
+        // End the game after x hands
+        if (handCounter == 1) {
+            break;
+        }
+        createHeader(handCounter);
+        
+        registerAction(PASS, raise);
         // Reset hands for all players
         for (int i = 0; i < PLAYER; i++) {
             players[i]->resetHand();
         }
-
         status = PREFLOP;
         smallBlind();
         bigBlind();
@@ -222,10 +228,7 @@ void Table::GameLoop() {
 
         passButton();
 
-        // End the game after x hands
-        if (handCounter == 200) {
-            break;
-        }
+
 
         handCounter++;
     }
@@ -784,4 +787,50 @@ vector<int> Table::defineWinner() {
 
     return winners;
 }
-    
+   
+void Table::createHeader(int handNumber){
+    ofstream plik("../dane.txt");
+
+    if (plik.is_open()) {
+        plik << "Hand nr: " << handNumber << endl;
+        plik << "Number of players: " << PLAYER << endl;
+        plik << "Button on player: " << button << endl;
+        //stack info
+        for(int i=0; i<PLAYER;i++){
+            plik << "Player " << i << " have " << players[i]->getStack() << " in his stack" << endl;
+        }
+        plik.close(); // zamykamy plik po zakończeniu operacji
+    } else {
+        std::cerr << "Nie udalo sie otworzyc pliku do zapisu.\n";
+    }
+}
+
+void Table::registerAction(Action action, int raiseMoney){
+    std::ifstream inFile("../dane.txt");
+    std::stringstream buffer;
+
+    if (inFile.is_open()) {
+        buffer << inFile.rdbuf(); // read entire file into buffer
+        inFile.close();
+    } else {
+        std::cerr << "Cannot open file to read.\n";
+    }
+
+    std::string content = buffer.str();
+
+    // Now modify the content
+    size_t pos = content.find("Hand nr: 3");
+    if (pos != std::string::npos) {
+        content.replace(pos, 10, "Hand nr: X");
+    }
+
+    std::ofstream outFile("../dane.txt"); // open again in write mode
+    if (outFile.is_open()) {
+        outFile << content;
+        outFile << "CHUJ" << endl;
+        cout << "chuj" << endl;
+        outFile.close();
+    } else {
+        std::cerr << "Cannot open file to write.\n";
+    }
+}
