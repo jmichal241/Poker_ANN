@@ -8,6 +8,7 @@
 #include "kloziobot.h"
 #include "GPT1bot.h"
 #include "GPT2bot.h"
+#include "lukibot.h"
 
 
 

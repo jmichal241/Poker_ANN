@@ -8,6 +8,7 @@ Lukibot::Lukibot(int initialStack) : Player(initialStack) {}
 
 Action Lukibot::makeAction(int raiseMoney, int pot, int tableButton) {
 
-
+    setAction(CALL);
+    return CALL;
 
 }
