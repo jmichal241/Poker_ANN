@@ -126,15 +126,14 @@ void Table::GameLoop() {
     while (true) {
         vector<int> winners;
         pot = 0;
-        createHeader(handCounter);
 
         // End the game after x hands
         if (handCounter == 1) {
             break;
         }
         createHeader(handCounter);
+
         
-        registerAction(PASS, raise);
         // Reset hands for all players
         for (int i = 0; i < PLAYER; i++) {
             players[i]->resetHand();
@@ -161,15 +160,17 @@ void Table::GameLoop() {
             // Get the action for the current player
             tempAction = currentPlayer->makeAction(raise, pot, button);
 
+            registerAction(currentPlayer->getAction(), raise, currentPlayerIndex);
+
             if (tempAction == PASS) {
-                // cout << "Player " << currentPlayerIndex << " folded" << endl;
+                cout << "Player " << currentPlayerIndex << " folded" << endl;
                 counter++; // Move to the next player
             } else {
                 // Handle RAISE action
                 if (tempAction == RAISE) {
                     raise = currentPlayer->getRaise();
                     currentPlayer->changeStack(-raise);
-                    // cout << "Player " << currentPlayerIndex << " raised by " << raise << endl;
+                    cout << "Player " << currentPlayerIndex << " raised by " << raise << endl;
                     pot += raise;
                 } 
                 // Handle CALL action
@@ -177,7 +178,7 @@ void Table::GameLoop() {
                     int callAmount = (raise > currentPlayer->getStack()) ? currentPlayer->getStack() : raise;
                     currentPlayer->changeStack(-callAmount);
                     pot += callAmount;
-                    // cout << "Player " << currentPlayerIndex << " called " << callAmount << endl;
+                    cout << "Player " << currentPlayerIndex << " called " << callAmount << endl;
                 }
                 counter++; // Move to the next player
             }
@@ -805,9 +806,9 @@ void Table::createHeader(int handNumber){
     }
 }
 
-void Table::registerAction(Action action, int raiseMoney){
-    std::ifstream inFile("../dane.txt");
-    std::stringstream buffer;
+void Table::registerAction(Action action, int raiseMoney, int playerNum){
+    ifstream inFile("../dane.txt");
+    stringstream buffer;
 
     if (inFile.is_open()) {
         buffer << inFile.rdbuf(); // read entire file into buffer
@@ -824,11 +825,20 @@ void Table::registerAction(Action action, int raiseMoney){
         content.replace(pos, 10, "Hand nr: X");
     }
 
-    std::ofstream outFile("../dane.txt"); // open again in write mode
+    
+    ofstream outFile("../dane.txt"); // open again in write mode
     if (outFile.is_open()) {
         outFile << content;
-        outFile << "CHUJ" << endl;
-        cout << "chuj" << endl;
+        outFile << "Player " << playerNum;
+
+        if(action==PASS)
+            outFile << " pass" << endl;
+        else if(action==CHECK)
+            outFile << " check" << endl;
+        else if(action==CALL)
+            outFile << " call" << endl;
+        else if(action==RAISE)
+            outFile << " raised to " << raise << endl;
         outFile.close();
     } else {
         std::cerr << "Cannot open file to write.\n";

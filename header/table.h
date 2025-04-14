@@ -4,6 +4,9 @@
 #include <algorithm> 
 #include <unordered_map>
 #include <set> 
+#include <fstream>
+#include <sstream>
+#include <string>
 #include "player.h"
 #include "kloziobot.h"
 #include "GPT1bot.h"
@@ -63,6 +66,11 @@ public:
     void displayBoard();
     void displayPlayers();
     void displayPot();
+
+    //Creating dataset
+    void createHeader(int);
+    void registerAction(Action,int, int);
+    void registerWin(int, int);
 };
 
 #endif 
