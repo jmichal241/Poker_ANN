@@ -6,8 +6,6 @@
 // In Kloziobot constructor
 Kloziobot::Kloziobot(int initialStack) : Player(initialStack) {}
 
-
-
 Action Kloziobot::makeAction(int raiseMoney, int pot, int tableButton) {
     
     // Hand strength evaluation logic

@@ -86,6 +86,16 @@ void Table::passButton(){
     players[button]->changeButton(1);
 }
 
+void Table::prepareTable(){
+    for (int i = 0; i < PLAYER; i++) {
+        players[i]->resetHand();
+    }
+    smallBlind();
+    bigBlind();
+    raise = BIG;
+    deal();
+}
+
 int Table::allActionMade(){
     int pass = 0;
     int check = 0;
@@ -137,22 +147,15 @@ void Table::GameLoop() {
         pot = 0;
 
         // End the game after x hands
-        if (handCounter == 10) {
+        if (handCounter == 10000) {
             break;
         }
         raise = BIG;
         createHeader(handCounter);
 
-        
+        status = PREFLOP; 
         // Reset hands for all players
-        for (int i = 0; i < PLAYER; i++) {
-            players[i]->resetHand();
-        }
-        status = PREFLOP;
-        smallBlind();
-        bigBlind();
-        raise = BIG;
-        deal();
+        prepareTable();
         heroInfo(handCounter,0);
         int counter = button + 3;
         Action tempAction;
@@ -166,6 +169,10 @@ void Table::GameLoop() {
             //     break;
             // }
             // Get the action for the current player
+            if(currentPlayer->getAction()==PASS){
+                counter++;
+                continue;
+            }
             tempAction = currentPlayer->makeAction(raise, pot, button);
 
             if (tempAction == PASS) {
@@ -173,17 +180,22 @@ void Table::GameLoop() {
             } else {
                 // Handle RAISE action
                 if (tempAction == RAISE) {
+                    int temp=0;
                     raise = currentPlayer->getRaise();
-                    currentPlayer->changeStack(-raise);
+                    temp=raise-currentPlayer->getPotAgency();
+                    currentPlayer->changeStack(-temp);
                     cout << "Player " << currentPlayerIndex << " raised to " << raise << endl;
-                    pot += raise;
+                    pot += temp;
+                    currentPlayer->changePotAgency(raise);
                 } 
                 // Handle CALL action
                 else if (tempAction == CALL) {
-                    int callAmount = (raise > currentPlayer->getStack()) ? currentPlayer->getStack() : raise;
-                    currentPlayer->changeStack(-callAmount);
-                    pot += callAmount;
-                    cout << "Player " << currentPlayerIndex << " called " << callAmount << endl;
+                    int temp=0;
+                    temp=raise-currentPlayer->getPotAgency();
+                    currentPlayer->changeStack(-temp);
+                    pot += temp;
+                    cout << "Player " << currentPlayerIndex << " called " << raise << endl;
+                    currentPlayer->changePotAgency(raise);
                 }
             }
             counter++; // Move to the next player

@@ -48,6 +48,7 @@ public:
     void bigBlind();
     void passButton();
     int allActionMade();
+    void prepareTable();
 
     //Methods for players
     int getPot();
