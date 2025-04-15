@@ -36,11 +36,11 @@ Action Kloziobot::makeAction(int raiseMoney, int pot, int tableButton) {
         setAction(PASS);
         return PASS;
     }
-    if(handStrength < 1 && button != 1){
+    Raise=raiseMoney;
+    if((handStrength < 1 && button != 1)){
         setAction(PASS);
         return PASS;
     }
-    
     else if(handStrength >= 3 && raiseMoney <= 10){
         setAction(RAISE);
         Raise = std::min(2 * BIG, stack);

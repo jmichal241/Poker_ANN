@@ -1,19 +1,21 @@
 Hand nr: 2
 Number of players: 5
 Button on player: 2
-Player 0 have 990 in his stack
-Player 1 have 1020 in his stack
-Player 2 have 975 in his stack
-Player 3 have 980 in his stack
-Player 4 have 1035 in his stack
-Current raise is:20
+Player 0 have 995 in his stack
+Player 1 have 995 in his stack
+Player 2 have 1020 in his stack
+Player 3 have 990 in his stack
+Player 4 have 1000 in his stack
+Current raise is:10
 Hero is player: 0 his hand is: 
-Card 0: 10 Heart
-Card 1: 5 Diamond
-Player 0 pass
-Player 1 raised to 10
+Card 0: 7 Spade
+Card 1: 6 Heart
+Player 0 call
+Player 1 raised to 20
 Player 2 pass
-Player 3 pass
+Player 3 raised to 40
 Player 4 pass
+Player 0 pass
+Player 1 call
 The winner is: 1
-The pot was: 35
+The pot was: 125

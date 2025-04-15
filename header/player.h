@@ -19,11 +19,11 @@ protected:
     Card hand[2];   //hand
     int Raise=0;    //raise number
     Action action;
+    int potAgency=0;
 public:
     Player(int);
     void display();
     void getCard(Card);
-
 
     virtual Action makeAction(int raiseMoney, int pot, int button);
 
@@ -36,6 +36,8 @@ public:
     void changeButton(bool);
     int getStack();
     Card returnCard(int);
+    void changePotAgency(int);
+    int getPotAgency();
 
     //akcje
     void check();

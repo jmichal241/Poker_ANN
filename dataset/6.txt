@@ -1,19 +1,20 @@
 Hand nr: 6
 Number of players: 5
 Button on player: 1
-Player 0 have 975 in his stack
-Player 1 have 1000 in his stack
-Player 2 have 970 in his stack
-Player 3 have 1065 in his stack
-Player 4 have 990 in his stack
-Current raise is:20
+Player 0 have 1040 in his stack
+Player 1 have 1070 in his stack
+Player 2 have 1000 in his stack
+Player 3 have 935 in his stack
+Player 4 have 955 in his stack
+Current raise is:10
 Hero is player: 0 his hand is: 
-Card 0: Q Spade
-Card 1: 6 Heart
-Player 3 call
-Player 4 pass
+Card 0: 3 Heart
+Card 1: Q Clubs
+Player 4 call
 Player 0 pass
-Player 1 raised to 10
+Player 1 raised to 20
 Player 2 pass
+Player 3 pass
+Player 4 pass
 The winner is: 1
 The pot was: 45

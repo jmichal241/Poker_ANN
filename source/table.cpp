@@ -60,28 +60,21 @@ void Table::deal(){
 void Table::smallBlind() {
     int temp = (button + 1) % PLAYER;
 
-    // Szukaj gracza z kasą
-    for (int i = 0; i < PLAYER; ++i) {
-        int idx = (temp + i) % PLAYER;
-        if (players[idx]->getStack() > 0) {
-            players[idx]->changeStack(-SMALL);
-            pot += SMALL;
-            break;
-        }
+    if (players[temp]->getStack() > 0) {
+        players[temp]->changeStack(-SMALL);
+        players[temp]->changePotAgency(SMALL);
+        pot += SMALL;
     }
 }
 
 void Table::bigBlind() {
     int temp = (button + 2) % PLAYER;
 
-    // Szukaj gracza z kasą
-    for (int i = 0; i < PLAYER; ++i) {
-        int idx = (temp + i) % PLAYER;
-        if (players[idx]->getStack() > 0) {
-            players[idx]->changeStack(-BIG);
-            pot += BIG;
-            break;
-        }
+
+    if (players[temp]->getStack() > 0) {
+        players[temp]->changeStack(-BIG);
+        players[temp]->changePotAgency(BIG);
+        pot += BIG;
     }
 }
 
@@ -99,7 +92,8 @@ int Table::allActionMade(){
     int call = 0;
     int raise = 0;
     Action action = NONE;
-
+    int highestRaise=0;
+    bool flag=1;
     for(int i = 0; i < PLAYER; i++){
         action = players[i]->getAction();
 
@@ -108,15 +102,28 @@ int Table::allActionMade(){
         if(action == CALL) call++;
         if(action == RAISE) raise++;
     }
-
+    for(int i = 0; i < PLAYER; i++){
+        if(players[i]->getRaise()>highestRaise){
+            highestRaise=players[i]->getRaise();
+        }
+    }
+    for(int i = 0; i < PLAYER; i++){
+        if(players[i]->getAction()==CALL && players[i]->getRaise()!=highestRaise){
+            flag=0;
+            break;
+        }
+    }
+    // cout << highestRaise << endl;
     // Everyone folded (only pass left)
     if(pass == PLAYER-1) return 1;  // everyone folded
 
     // Everyone checked (no one raised or called)
-    if(check + pass== PLAYER) return 2;     // everyone checked
+    if(CALL + pass== PLAYER) return 2;     // everyone checked
 
     // Everyone has called or there was a raise (round complete)
-    if(call + pass + raise== PLAYER ) return 3; // Everyone called, or a raise occurred
+    if(call + pass == PLAYER ) return 3; // Everyone called, or a raise occurred
+
+    if(raise==1 && (call + pass + raise == PLAYER) && flag==1) return 4;
 
     return 0;  // Actions are still in progress
 }
@@ -130,9 +137,10 @@ void Table::GameLoop() {
         pot = 0;
 
         // End the game after x hands
-        if (handCounter == 1) {
+        if (handCounter == 10) {
             break;
         }
+        raise = BIG;
         createHeader(handCounter);
 
         
@@ -151,28 +159,23 @@ void Table::GameLoop() {
 
         while (allActionMade() == 0) {
             // Get the current player
-            int currentPlayerIndex = (button + counter) % PLAYER;
+            int currentPlayerIndex = (counter) % PLAYER;
             Player* currentPlayer = players[currentPlayerIndex];
 
-            // Check if this player has raised the same amount as the last raise
-            if (currentPlayer->getAction() == RAISE && currentPlayer->getRaise() == raise) {
-                break; // All players have matched the raise
-            }
-
+            // if(currentPlayer->getRaise()==raise){
+            //     break;
+            // }
             // Get the action for the current player
             tempAction = currentPlayer->makeAction(raise, pot, button);
 
-            registerAction(currentPlayer->getAction(), raise, currentPlayerIndex, handCounter);
-
             if (tempAction == PASS) {
                 cout << "Player " << currentPlayerIndex << " folded" << endl;
-                counter++; // Move to the next player
             } else {
                 // Handle RAISE action
                 if (tempAction == RAISE) {
                     raise = currentPlayer->getRaise();
                     currentPlayer->changeStack(-raise);
-                    cout << "Player " << currentPlayerIndex << " raised by " << raise << endl;
+                    cout << "Player " << currentPlayerIndex << " raised to " << raise << endl;
                     pot += raise;
                 } 
                 // Handle CALL action
@@ -182,8 +185,9 @@ void Table::GameLoop() {
                     pot += callAmount;
                     cout << "Player " << currentPlayerIndex << " called " << callAmount << endl;
                 }
-                counter++; // Move to the next player
             }
+            counter++; // Move to the next player
+            registerAction(currentPlayer->getAction(), raise, currentPlayerIndex, handCounter);
         }
 
         // Handle community cards (flop, turn, river)
@@ -202,6 +206,7 @@ void Table::GameLoop() {
         }
         cout << endl;
         registerWin(winners,handCounter);
+
         // Distribute the pot
         int share = pot / winners.size();
         int remainder = pot % winners.size();

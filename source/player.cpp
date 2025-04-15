@@ -29,6 +29,7 @@ void Player::resetHand(){
     hand[1].setNumber(0);
     hand[1].setColour(SPADE);
     action=NONE;
+    potAgency=0;
 }
 void Player::changeStack(int change){
     stack = stack + change;
@@ -109,4 +110,12 @@ Card Player::returnCard(int index){
 
 int Player::getRaise(){
     return Raise;
+}
+
+void Player::changePotAgency(int money){
+    potAgency = money;
+}
+
+int Player::getPotAgency(){
+    return potAgency;
 }
