@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <random>
+
 #include "player.h"
 #include "kloziobot.h"
 #include "GPT1bot.h"
@@ -65,7 +67,7 @@ public:
     void displayPot();
 
     //Creating dataset
-    void createHeader(int);
+    void createHeader(int, int);
     void registerAction(Action,int, int, int);
     void registerWin(vector<int>&, int);
     void heroInfo(int, int);

@@ -141,17 +141,23 @@ int Table::allActionMade(){
 void Table::GameLoop() {
     resetboard();
     int handCounter = 0;
+    std::random_device rd;  // Uzyskujemy ziarno
+    std::mt19937 gen(rd()); // Generator Mersenne Twister
+    std::uniform_int_distribution<> distrib(1, 100); // Przedział od 1 do 100
+
+    // Losowanie liczby z przedziału
+    int random_number;
 
     while (true) {
         vector<int> winners;
         pot = 0;
-
+        random_number = distrib(gen);
         // End the game after x hands
-        if (handCounter == 10000) {
+        if (handCounter == 10) {
             break;
         }
         raise = BIG;
-        createHeader(handCounter);
+        createHeader(handCounter, random_number);
 
         status = PREFLOP; 
         // Reset hands for all players
@@ -807,19 +813,16 @@ vector<int> Table::defineWinner() {
     return winners;
 }
    
-void Table::createHeader(int handNumber){
-    string fileName = "dataset/" + std::to_string(handNumber) + ".txt";
+void Table::createHeader(int handNumber, int playerNum){
+    string fileName = "dataset/" + std::to_string(handNumber) + ".json";
     ofstream plik(fileName);
-
+    playerNum=playerNum%PLAYER;
     if (plik.is_open()) {
-        plik << "Hand nr: " << handNumber << endl;
-        plik << "Number of players: " << PLAYER << endl;
-        plik << "Button on player: " << button << endl;
-        //stack info
-        for(int i=0; i<PLAYER;i++){
-            plik << "Player " << i << " have " << players[i]->getStack() << " in his stack" << endl;
-        }
-        plik << "Current raise is:" << raise << endl;
+        plik << "{" << endl;
+        plik << "\"Number of players\": " << PLAYER << ", " << endl;
+        plik << "\"Button on player\": " << button << ", " << endl;
+        // plik << "\"Hero on spot\": " << playerNum << ", " << endl;
+        plik << "\"BB is\": " << BIG << ", " << endl;
         plik.close(); // zamykamy plik po zakończeniu operacji
     } else {
         std::cerr << "Nie udalo sie otworzyc pliku do zapisu.\n";
@@ -827,7 +830,7 @@ void Table::createHeader(int handNumber){
 }
 
 void Table::registerAction(Action action, int raiseMoney, int playerNum, int handNumber){
-    string fileName = "dataset/" + std::to_string(handNumber) + ".txt";
+    string fileName = "dataset/" + std::to_string(handNumber) + ".json";
     ifstream inFile(fileName);
     stringstream buffer;
 
@@ -850,16 +853,18 @@ void Table::registerAction(Action action, int raiseMoney, int playerNum, int han
     ofstream outFile(fileName); // open again in write mode
     if (outFile.is_open()) {
         outFile << content;
-        outFile << "Player " << playerNum;
-
+        outFile << "{" << endl;
+        outFile << "\"player\": " << playerNum << ", " << endl;
+        outFile << "\"action\": ";
         if(action==PASS)
-            outFile << " pass" << endl;
+            outFile << "\"pass\"" << endl;
         else if(action==CHECK)
-            outFile << " check" << endl;
+            outFile << "\"check\"" << endl;
         else if(action==CALL)
-            outFile << " call" << endl;
+            outFile << "\"call\"" << endl;
         else if(action==RAISE)
-            outFile << " raised to " << raise << endl;
+            outFile << "\"raise\"" << ", " << endl << "\"amount\": " << raiseMoney << endl;
+        outFile << "}," << endl;
         outFile.close();
     } else {
         std::cerr << "Cannot open file to write.\n";
@@ -867,7 +872,7 @@ void Table::registerAction(Action action, int raiseMoney, int playerNum, int han
 }
 
 void Table::registerWin(vector<int>& winners, int handNumber){
-    string fileName = "dataset/" + std::to_string(handNumber) + ".txt";
+    string fileName = "dataset/" + std::to_string(handNumber) + ".json";
     ifstream inFile(fileName);
     stringstream buffer;
 
@@ -885,23 +890,29 @@ void Table::registerWin(vector<int>& winners, int handNumber){
     if (pos != std::string::npos) {
         content.replace(pos, 10, "Hand nr: X");
     }
-
-    
+    content.pop_back();
+    content.pop_back();
     ofstream outFile(fileName); // open again in write mode
     if (outFile.is_open()) {
         outFile << content;
+        outFile << endl;
+        outFile << "], " << endl;
         if(winners.size()==1){
-            outFile << "The winner is: " << winners[0] << endl;
+            outFile << "\"winner\": " << winners[0] << ", " << endl;
         }
         else{
-            outFile << "The winner are: ";
+            outFile << "\"winners\": [";
             for(int i=0; i< winners.size(); i++){
-                outFile << winners[i] << " ";
+                if(i==winners.size()-1)
+                    outFile << winners[i] << "]";
+                else
+                    outFile << winners[i] << ", ";
             }
             outFile << endl;
             
         }   
-        outFile << "The pot was: " << pot << endl;
+        outFile << "\"pot\": " << pot << endl;
+        outFile << "}";
         outFile.close();
     } else {
         std::cerr << "Cannot open file to write.\n";
@@ -909,7 +920,7 @@ void Table::registerWin(vector<int>& winners, int handNumber){
 }
 
 void Table::heroInfo(int handNumber, int playerNumber){
-    string fileName = "dataset/" + std::to_string(handNumber) + ".txt";
+    string fileName = "dataset/" + std::to_string(handNumber) + ".json";
 
     Card tempHand[2];
     tempHand[0] = players[playerNumber]->returnCard(0);
@@ -928,38 +939,41 @@ void Table::heroInfo(int handNumber, int playerNumber){
     std::string content = buffer.str();
 
     // Now modify the content
-    size_t pos = content.find("Hand nr: 3");
-    if (pos != std::string::npos) {
-        content.replace(pos, 10, "Hand nr: X");
-    }
 
-    
     ofstream outFile(fileName); // open again in write mode
     if (outFile.is_open()) {
         outFile << content;   
-        outFile << "Hero is player: " << playerNumber << " his hand is: " << endl;
+        outFile << "\"Hero_info\": " << "{" << endl << "\"player\": " << playerNumber << ", "<< endl;
+        outFile << "\"cards\": " << "[" << endl;
         for(int i=0; i<2;i++){
-            outFile << "Card " << i << ": "; //<< tempHand[i].getNumber() << " " << tempHand[i].getColour() << endl;
-            if(tempHand[i].getNumber()==11)
-                outFile << "J ";
-            else if(tempHand[i].getNumber()==12)
-                outFile << "Q ";
-            else if(tempHand[i].getNumber()==13)
-                outFile << "K ";
-            else if(tempHand[i].getNumber()==14)
-                outFile << "A ";   
-            else 
-                outFile <<  tempHand[i].getNumber() << " ";
+            outFile << "{" << "\"card\": " << tempHand[i].getNumber() << ", " << "\"suit\": ";
+            // if(tempHand[i].getNumber()==11)
+            //     outFile << "J ";
+            // else if(tempHand[i].getNumber()==12)
+            //     outFile << "Q ";
+            // else if(tempHand[i].getNumber()==13)
+            //     outFile << "K ";
+            // else if(tempHand[i].getNumber()==14)
+            //     outFile << "A ";   
+            // else 
+            //     outFile <<  tempHand[i].getNumber() << " ";
             if(tempHand[i].getColour()==0)
-                outFile << "Spade"; 
+                outFile << "\"Spade\""; 
             else if(tempHand[i].getColour()==1)
-                outFile << "Clubs";
+                outFile << "\"Clubs\"";
             else if(tempHand[i].getColour()==2)
-                outFile << "Diamond";
+                outFile << "\"Diamond\"";
             else
-                outFile << "Heart"; 
-            outFile << endl;
+                outFile << "\"Heart\""; 
+            outFile << "}";
+            if(i==0)
+                outFile << ", " << endl;
+            else    
+                outFile << endl;
         }
+        outFile << "]" << endl;
+        outFile << "}," << endl;
+        outFile << "\"actions\": [" << endl;
         outFile.close();
     } else {
         std::cerr << "Cannot open file to write.\n";
