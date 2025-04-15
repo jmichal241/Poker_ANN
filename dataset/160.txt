@@ -1,0 +1,19 @@
+Hand nr: 160
+Number of players: 5
+Button on player: 0
+Player 0 have 1021 in his stack
+Player 1 have 825 in his stack
+Player 2 have 1148 in his stack
+Player 3 have 1113 in his stack
+Player 4 have 893 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: Q Heart
+Card 1: 9 Diamond
+Player 1 call
+Player 2 call
+Player 3 pass
+Player 4 pass
+Player 0 call
+The winner is: 2
+The pot was: 45

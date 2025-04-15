@@ -1,0 +1,19 @@
+Hand nr: 298
+Number of players: 5
+Button on player: 3
+Player 0 have 577 in his stack
+Player 1 have 945 in his stack
+Player 2 have 1499 in his stack
+Player 3 have 1044 in his stack
+Player 4 have 935 in his stack
+Current raise is:80
+Hero is player: 0 his hand is: 
+Card 0: Q Heart
+Card 1: K Spade
+Player 2 raised to 10
+Player 3 call
+Player 4 pass
+Player 0 raised to 20
+Player 1 pass
+The winner is: 2
+The pot was: 95

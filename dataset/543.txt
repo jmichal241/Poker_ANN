@@ -1,0 +1,19 @@
+Hand nr: 543
+Number of players: 5
+Button on player: 3
+Player 0 have 0 in his stack
+Player 1 have 1357 in his stack
+Player 2 have 1591 in his stack
+Player 3 have 1480 in his stack
+Player 4 have 572 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 7 Heart
+Card 1: K Diamond
+Player 2 call
+Player 3 call
+Player 4 raised to 10
+Player 0 pass
+Player 1 call
+The winner is: 1
+The pot was: 75

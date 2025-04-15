@@ -1,0 +1,19 @@
+Hand nr: X12
+Number of players: 5
+Button on player: 2
+Player 0 have 527 in his stack
+Player 1 have 878 in his stack
+Player 2 have 1526 in his stack
+Player 3 have 1079 in his stack
+Player 4 have 990 in his stack
+Current raise is:80
+Hero is player: 0 his hand is: 
+Card 0: 10 Diamond
+Card 1: 6 Spade
+Player 0 pass
+Player 1 pass
+Player 2 call
+Player 3 call
+Player 4 raised to 10
+The winner is: 3
+The pot was: 55

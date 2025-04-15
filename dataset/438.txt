@@ -1,0 +1,19 @@
+Hand nr: 438
+Number of players: 5
+Button on player: 3
+Player 0 have 270 in his stack
+Player 1 have 1137 in his stack
+Player 2 have 1776 in his stack
+Player 3 have 955 in his stack
+Player 4 have 862 in his stack
+Current raise is:40
+Hero is player: 0 his hand is: 
+Card 0: 8 Spade
+Card 1: 3 Heart
+Player 2 pass
+Player 3 call
+Player 4 raised to 10
+Player 0 pass
+Player 1 call
+The winner is: 3
+The pot was: 65

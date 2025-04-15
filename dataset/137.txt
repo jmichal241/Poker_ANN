@@ -1,0 +1,19 @@
+Hand nr: 137
+Number of players: 5
+Button on player: 2
+Player 0 have 1021 in his stack
+Player 1 have 865 in his stack
+Player 2 have 918 in his stack
+Player 3 have 1083 in his stack
+Player 4 have 1113 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: A Heart
+Card 1: 6 Diamond
+Player 0 raised to 10
+Player 1 call
+Player 2 pass
+Player 3 call
+Player 4 pass
+The winner is: 0
+The pot was: 75

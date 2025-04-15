@@ -1,0 +1,19 @@
+Hand nr: 884
+Number of players: 5
+Button on player: 4
+Player 0 have 0 in his stack
+Player 1 have 784 in his stack
+Player 2 have 1534 in his stack
+Player 3 have 1924 in his stack
+Player 4 have 758 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 9 Heart
+Card 1: 2 Heart
+Player 4 call
+Player 0 pass
+Player 1 pass
+Player 2 call
+Player 3 pass
+The winner is: 4
+The pot was: 35

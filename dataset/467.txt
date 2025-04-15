@@ -1,0 +1,19 @@
+Hand nr: 467
+Number of players: 5
+Button on player: 2
+Player 0 have 210 in his stack
+Player 1 have 1187 in his stack
+Player 2 have 1686 in his stack
+Player 3 have 1130 in his stack
+Player 4 have 787 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: K Spade
+Card 1: A Spade
+Player 0 raised to 10
+Player 1 pass
+Player 2 pass
+Player 3 call
+Player 4 pass
+The winner is: 0
+The pot was: 55

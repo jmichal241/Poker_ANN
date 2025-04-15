@@ -1,0 +1,19 @@
+Hand nr: X27
+Number of players: 5
+Button on player: 2
+Player 0 have 582 in his stack
+Player 1 have 853 in his stack
+Player 2 have 1436 in his stack
+Player 3 have 1089 in his stack
+Player 4 have 1040 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: Q Diamond
+Card 1: 4 Spade
+Player 0 pass
+Player 1 pass
+Player 2 call
+Player 3 pass
+Player 4 pass
+The winner is: 2
+The pot was: 25

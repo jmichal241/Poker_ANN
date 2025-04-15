@@ -1,0 +1,19 @@
+Hand nr: 290
+Number of players: 5
+Button on player: 0
+Player 0 have 607 in his stack
+Player 1 have 1010 in his stack
+Player 2 have 1409 in his stack
+Player 3 have 1114 in his stack
+Player 4 have 860 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: A Spade
+Card 1: 7 Clubs
+Player 1 raised to 10
+Player 2 pass
+Player 3 pass
+Player 4 pass
+Player 0 call
+The winner is: 0
+The pot was: 55

@@ -1,0 +1,19 @@
+Hand nr: X86
+Number of players: 5
+Button on player: 1
+Player 0 have 512 in his stack
+Player 1 have 1149 in his stack
+Player 2 have 1634 in his stack
+Player 3 have 898 in his stack
+Player 4 have 807 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 4 Spade
+Card 1: K Clubs
+Player 3 pass
+Player 4 raised to 10
+Player 0 pass
+Player 1 raised to 20
+Player 2 pass
+The winner is: 4
+The pot was: 115

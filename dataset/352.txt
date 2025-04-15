@@ -1,0 +1,19 @@
+Hand nr: X52
+Number of players: 5
+Button on player: 2
+Player 0 have 452 in his stack
+Player 1 have 1034 in his stack
+Player 2 have 1429 in his stack
+Player 3 have 1128 in his stack
+Player 4 have 957 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 10 Heart
+Card 1: 3 Heart
+Player 0 call
+Player 1 pass
+Player 2 call
+Player 3 raised to 10
+Player 4 pass
+The winner is: 0
+The pot was: 55

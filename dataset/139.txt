@@ -1,0 +1,19 @@
+Hand nr: 139
+Number of players: 5
+Button on player: 4
+Player 0 have 1026 in his stack
+Player 1 have 845 in his stack
+Player 2 have 918 in his stack
+Player 3 have 1113 in his stack
+Player 4 have 1098 in his stack
+Current raise is:40
+Hero is player: 0 his hand is: 
+Card 0: 2 Spade
+Card 1: 10 Spade
+Player 4 call
+Player 0 call
+Player 1 raised to 10
+Player 2 raised to 20
+Player 3 pass
+The winner is: 2
+The pot was: 135

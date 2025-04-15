@@ -1,0 +1,19 @@
+Hand nr: 574
+Number of players: 5
+Button on player: 4
+Player 0 have 0 in his stack
+Player 1 have 1405 in his stack
+Player 2 have 1436 in his stack
+Player 3 have 1798 in his stack
+Player 4 have 361 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: K Spade
+Card 1: 7 Heart
+Player 4 raised to 10
+Player 0 pass
+Player 1 call
+Player 2 pass
+Player 3 pass
+The winner is: 1
+The pot was: 55

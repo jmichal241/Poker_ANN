@@ -1,0 +1,19 @@
+Hand nr: 224
+Number of players: 5
+Button on player: 4
+Player 0 have 756 in his stack
+Player 1 have 820 in his stack
+Player 2 have 1551 in his stack
+Player 3 have 1174 in his stack
+Player 4 have 699 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: 7 Clubs
+Card 1: K Clubs
+Player 4 call
+Player 0 raised to 10
+Player 1 pass
+Player 2 pass
+Player 3 pass
+The winner are: 0 4 
+The pot was: 45

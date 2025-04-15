@@ -1,0 +1,19 @@
+Hand nr: 915
+Number of players: 5
+Button on player: 0
+Player 0 have 0 in his stack
+Player 1 have 694 in his stack
+Player 2 have 1534 in his stack
+Player 3 have 1922 in his stack
+Player 4 have 850 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: 10 Spade
+Card 1: 7 Clubs
+Player 1 raised to 10
+Player 2 pass
+Player 3 pass
+Player 4 pass
+Player 0 pass
+The winner is: 1
+The pot was: 35

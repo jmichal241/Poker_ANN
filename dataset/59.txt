@@ -1,0 +1,19 @@
+Hand nr: 59
+Number of players: 5
+Button on player: 4
+Player 0 have 1010 in his stack
+Player 1 have 1135 in his stack
+Player 2 have 1063 in his stack
+Player 3 have 872 in his stack
+Player 4 have 920 in his stack
+Current raise is:40
+Hero is player: 0 his hand is: 
+Card 0: 6 Spade
+Card 1: Q Diamond
+Player 4 call
+Player 0 pass
+Player 1 raised to 10
+Player 2 pass
+Player 3 pass
+The winner is: 4
+The pot was: 45

@@ -1,0 +1,19 @@
+Hand nr: 684
+Number of players: 5
+Button on player: 4
+Player 0 have 0 in his stack
+Player 1 have 1136 in his stack
+Player 2 have 1606 in his stack
+Player 3 have 1815 in his stack
+Player 4 have 443 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: A Spade
+Card 1: 4 Spade
+Player 4 call
+Player 0 pass
+Player 1 raised to 10
+Player 2 pass
+Player 3 pass
+The winner is: 4
+The pot was: 45

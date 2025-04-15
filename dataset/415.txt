@@ -1,0 +1,19 @@
+Hand nr: 415
+Number of players: 5
+Button on player: 0
+Player 0 have 392 in his stack
+Player 1 have 1129 in his stack
+Player 2 have 1829 in his stack
+Player 3 have 748 in his stack
+Player 4 have 902 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: Q Heart
+Card 1: 9 Clubs
+Player 1 call
+Player 2 pass
+Player 3 raised to 10
+Player 4 pass
+Player 0 pass
+The winner are: 1 3 
+The pot was: 45

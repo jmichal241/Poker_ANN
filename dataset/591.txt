@@ -1,0 +1,19 @@
+Hand nr: 591
+Number of players: 5
+Button on player: 1
+Player 0 have 0 in his stack
+Player 1 have 1455 in his stack
+Player 2 have 1401 in his stack
+Player 3 have 1793 in his stack
+Player 4 have 351 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: K Diamond
+Card 1: 4 Clubs
+Player 3 call
+Player 4 pass
+Player 0 pass
+Player 1 call
+Player 2 raised to 10
+The winner are: 2 3 
+The pot was: 55

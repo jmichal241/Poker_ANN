@@ -1,0 +1,19 @@
+Hand nr: 148
+Number of players: 5
+Button on player: 3
+Player 0 have 1031 in his stack
+Player 1 have 835 in his stack
+Player 2 have 958 in his stack
+Player 3 have 1143 in his stack
+Player 4 have 1033 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: K Clubs
+Card 1: J Spade
+Player 2 call
+Player 3 call
+Player 4 pass
+Player 0 raised to 10
+Player 1 call
+The winner is: 0
+The pot was: 75

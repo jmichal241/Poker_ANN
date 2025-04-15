@@ -1,0 +1,19 @@
+Hand nr: 804
+Number of players: 5
+Button on player: 4
+Player 0 have 0 in his stack
+Player 1 have 991 in his stack
+Player 2 have 1209 in his stack
+Player 3 have 2042 in his stack
+Player 4 have 758 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 9 Spade
+Card 1: Q Heart
+Player 4 call
+Player 0 pass
+Player 1 pass
+Player 2 pass
+Player 3 call
+The winner is: 3
+The pot was: 35

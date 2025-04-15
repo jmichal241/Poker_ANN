@@ -1,0 +1,19 @@
+Hand nr: 533
+Number of players: 5
+Button on player: 3
+Player 0 have 90 in his stack
+Player 1 have 1212 in his stack
+Player 2 have 1636 in his stack
+Player 3 have 1465 in his stack
+Player 4 have 597 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 10 Clubs
+Card 1: K Heart
+Player 2 raised to 10
+Player 3 pass
+Player 4 call
+Player 0 pass
+Player 1 pass
+The winner is: 2
+The pot was: 55

@@ -1,0 +1,19 @@
+Hand nr: 955
+Number of players: 5
+Button on player: 0
+Player 0 have 0 in his stack
+Player 1 have 702 in his stack
+Player 2 have 1514 in his stack
+Player 3 have 1682 in his stack
+Player 4 have 1102 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 10 Clubs
+Card 1: 3 Diamond
+Player 1 pass
+Player 2 call
+Player 3 raised to 10
+Player 4 raised to 20
+Player 0 pass
+The winner is: 4
+The pot was: 85

@@ -1,6 +1,6 @@
 #include "../header/table.h"
 #define STACK_SIZE 1000
-#define PLAYER 4
+#define PLAYER 5
 #define SMALL 5
 #define BIG 10
 
@@ -8,12 +8,14 @@
 Table::Table() {
     players.push_back(new Kloziobot(STACK_SIZE));  // Use pointer to store Kloziobot
     players[0]->resetHand();  // Reset hand for Kloziobot
-    players.push_back(new Lukibot(STACK_SIZE));  // Add another Kloziobot as the second player
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the second player
     players[1]->resetHand();  // Reset hand for the second Kloziobot
-    players.push_back(new GPT2bot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
     players[2]->resetHand();  // Reset hand for the third Kloziobot
-    players.push_back(new GPT1bot(STACK_SIZE));  // Add another Kloziobot as the third player
-    players[2]->resetHand(); 
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players[3]->resetHand(); 
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players[4]->resetHand(); 
 
     players[0]->changeButton(1);  // Assign button to the first player (the first Kloziobot)
     deck.shuffle();  // Shuffle the deck
@@ -128,7 +130,7 @@ void Table::GameLoop() {
         pot = 0;
 
         // End the game after x hands
-        if (handCounter == 1) {
+        if (handCounter == 1000) {
             break;
         }
         createHeader(handCounter);
@@ -790,7 +792,8 @@ vector<int> Table::defineWinner() {
 }
    
 void Table::createHeader(int handNumber){
-    ofstream plik("../dane.txt");
+    string fileName = "../dataset/" + std::to_string(handNumber) + ".txt";
+    ofstream plik(fileName);
 
     if (plik.is_open()) {
         plik << "Hand nr: " << handNumber << endl;
@@ -808,7 +811,8 @@ void Table::createHeader(int handNumber){
 }
 
 void Table::registerAction(Action action, int raiseMoney, int playerNum, int handNumber){
-    ifstream inFile("../dane.txt");
+    string fileName = "../dataset/" + std::to_string(handNumber) + ".txt";
+    ifstream inFile(fileName);
     stringstream buffer;
 
     if (inFile.is_open()) {
@@ -827,7 +831,7 @@ void Table::registerAction(Action action, int raiseMoney, int playerNum, int han
     }
 
     
-    ofstream outFile("../dane.txt"); // open again in write mode
+    ofstream outFile(fileName); // open again in write mode
     if (outFile.is_open()) {
         outFile << content;
         outFile << "Player " << playerNum;
@@ -847,7 +851,8 @@ void Table::registerAction(Action action, int raiseMoney, int playerNum, int han
 }
 
 void Table::registerWin(vector<int>& winners, int handNumber){
-    ifstream inFile("../dane.txt");
+    string fileName = "../dataset/" + std::to_string(handNumber) + ".txt";
+    ifstream inFile(fileName);
     stringstream buffer;
 
     if (inFile.is_open()) {
@@ -866,7 +871,7 @@ void Table::registerWin(vector<int>& winners, int handNumber){
     }
 
     
-    ofstream outFile("../dane.txt"); // open again in write mode
+    ofstream outFile(fileName); // open again in write mode
     if (outFile.is_open()) {
         outFile << content;
         if(winners.size()==1){
@@ -888,6 +893,8 @@ void Table::registerWin(vector<int>& winners, int handNumber){
 }
 
 void Table::heroInfo(int handNumber, int playerNumber){
+    string fileName = "../dataset/" + std::to_string(handNumber) + ".txt";
+
     Card tempHand[2];
     tempHand[0] = players[playerNumber]->returnCard(0);
     tempHand[1] = players[playerNumber]->returnCard(1);
@@ -896,7 +903,7 @@ void Table::heroInfo(int handNumber, int playerNumber){
     tempColour[0]=tempHand[0].getColour();
     tempColour[1]=tempHand[1].getColour();
 
-    ifstream inFile("../dane.txt");
+    ifstream inFile(fileName);
     stringstream buffer;
 
     if (inFile.is_open()) {
@@ -915,7 +922,7 @@ void Table::heroInfo(int handNumber, int playerNumber){
     }
 
     
-    ofstream outFile("../dane.txt"); // open again in write mode
+    ofstream outFile(fileName); // open again in write mode
     if (outFile.is_open()) {
         outFile << content;   
         outFile << "Hero is player: " << playerNumber << " his hand is: " << endl;

@@ -1,0 +1,19 @@
+Hand nr: X26
+Number of players: 5
+Button on player: 1
+Player 0 have 557 in his stack
+Player 1 have 853 in his stack
+Player 2 have 1441 in his stack
+Player 3 have 1099 in his stack
+Player 4 have 1050 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: A Spade
+Card 1: 2 Spade
+Player 3 pass
+Player 4 call
+Player 0 raised to 10
+Player 1 pass
+Player 2 pass
+The winner is: 0
+The pot was: 45

@@ -1,0 +1,19 @@
+Hand nr: 747
+Number of players: 5
+Button on player: 2
+Player 0 have 0 in his stack
+Player 1 have 856 in his stack
+Player 2 have 1281 in his stack
+Player 3 have 2280 in his stack
+Player 4 have 583 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: 9 Spade
+Card 1: 4 Diamond
+Player 0 pass
+Player 1 pass
+Player 2 call
+Player 3 call
+Player 4 raised to 10
+The winner is: 4
+The pot was: 55

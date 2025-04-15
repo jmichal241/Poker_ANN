@@ -1,0 +1,19 @@
+Hand nr: 213
+Number of players: 5
+Button on player: 3
+Player 0 have 821 in his stack
+Player 1 have 860 in his stack
+Player 2 have 1471 in his stack
+Player 3 have 1159 in his stack
+Player 4 have 689 in his stack
+Current raise is:80
+Hero is player: 0 his hand is: 
+Card 0: 10 Clubs
+Card 1: 7 Diamond
+Player 2 pass
+Player 3 raised to 10
+Player 4 pass
+Player 0 pass
+Player 1 call
+The winner is: 3
+The pot was: 55

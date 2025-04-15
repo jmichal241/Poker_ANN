@@ -1,0 +1,19 @@
+Hand nr: X50
+Number of players: 5
+Button on player: 0
+Player 0 have 477 in his stack
+Player 1 have 924 in his stack
+Player 2 have 1464 in his stack
+Player 3 have 1158 in his stack
+Player 4 have 977 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: A Diamond
+Card 1: K Heart
+Player 1 raised to 10
+Player 2 call
+Player 3 pass
+Player 4 pass
+Player 0 raised to 20
+The winner is: 1
+The pot was: 135

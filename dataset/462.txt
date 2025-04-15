@@ -1,0 +1,19 @@
+Hand nr: 462
+Number of players: 5
+Button on player: 2
+Player 0 have 295 in his stack
+Player 1 have 1147 in his stack
+Player 2 have 1626 in his stack
+Player 3 have 1090 in his stack
+Player 4 have 842 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: K Diamond
+Card 1: 5 Clubs
+Player 0 pass
+Player 1 raised to 10
+Player 2 raised to 20
+Player 3 pass
+Player 4 raised to 40
+The winner is: 2
+The pot was: 155

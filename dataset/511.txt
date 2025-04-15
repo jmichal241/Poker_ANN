@@ -1,0 +1,19 @@
+Hand nr: 511
+Number of players: 5
+Button on player: 1
+Player 0 have 260 in his stack
+Player 1 have 1137 in his stack
+Player 2 have 1726 in his stack
+Player 3 have 1265 in his stack
+Player 4 have 612 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: 2 Diamond
+Card 1: 10 Diamond
+Player 3 pass
+Player 4 raised to 10
+Player 0 pass
+Player 1 pass
+Player 2 pass
+The winner is: 4
+The pot was: 35

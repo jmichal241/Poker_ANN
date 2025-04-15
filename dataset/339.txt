@@ -1,0 +1,19 @@
+Hand nr: X39
+Number of players: 5
+Button on player: 4
+Player 0 have 547 in his stack
+Player 1 have 843 in his stack
+Player 2 have 1509 in his stack
+Player 3 have 1201 in his stack
+Player 4 have 900 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: A Diamond
+Card 1: Q Clubs
+Player 4 call
+Player 0 raised to 10
+Player 1 pass
+Player 2 pass
+Player 3 pass
+The winner is: 0
+The pot was: 45

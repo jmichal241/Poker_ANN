@@ -1,0 +1,19 @@
+Hand nr: 292
+Number of players: 5
+Button on player: 2
+Player 0 have 632 in his stack
+Player 1 have 965 in his stack
+Player 2 have 1439 in his stack
+Player 3 have 1104 in his stack
+Player 4 have 860 in his stack
+Current raise is:80
+Hero is player: 0 his hand is: 
+Card 0: 3 Heart
+Card 1: 6 Clubs
+Player 0 pass
+Player 1 call
+Player 2 call
+Player 3 pass
+Player 4 call
+The winner is: 2
+The pot was: 45

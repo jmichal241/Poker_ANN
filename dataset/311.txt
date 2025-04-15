@@ -1,0 +1,19 @@
+Hand nr: X11
+Number of players: 5
+Button on player: 1
+Player 0 have 527 in his stack
+Player 1 have 958 in his stack
+Player 2 have 1531 in his stack
+Player 3 have 1109 in his stack
+Player 4 have 875 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: 7 Clubs
+Card 1: 2 Spade
+Player 3 raised to 10
+Player 4 call
+Player 0 pass
+Player 1 raised to 20
+Player 2 pass
+The winner is: 4
+The pot was: 135

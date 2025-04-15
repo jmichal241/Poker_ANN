@@ -1,0 +1,19 @@
+Hand nr: X37
+Number of players: 5
+Button on player: 2
+Player 0 have 557 in his stack
+Player 1 have 828 in his stack
+Player 2 have 1509 in his stack
+Player 3 have 1191 in his stack
+Player 4 have 915 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 7 Heart
+Card 1: 9 Diamond
+Player 0 pass
+Player 1 raised to 10
+Player 2 pass
+Player 3 pass
+Player 4 pass
+The winner is: 1
+The pot was: 35

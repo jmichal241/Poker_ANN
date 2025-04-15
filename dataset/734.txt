@@ -1,0 +1,19 @@
+Hand nr: 734
+Number of players: 5
+Button on player: 4
+Player 0 have 0 in his stack
+Player 1 have 901 in his stack
+Player 2 have 1321 in his stack
+Player 3 have 2195 in his stack
+Player 4 have 583 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 3 Clubs
+Card 1: 10 Spade
+Player 4 call
+Player 0 pass
+Player 1 pass
+Player 2 call
+Player 3 call
+The winner is: 4
+The pot was: 45

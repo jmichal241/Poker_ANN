@@ -1,0 +1,19 @@
+Hand nr: 517
+Number of players: 5
+Button on player: 2
+Player 0 have 205 in his stack
+Player 1 have 1157 in his stack
+Player 2 have 1756 in his stack
+Player 3 have 1255 in his stack
+Player 4 have 627 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 8 Spade
+Card 1: J Diamond
+Player 0 pass
+Player 1 pass
+Player 2 call
+Player 3 call
+Player 4 raised to 10
+The winner is: 4
+The pot was: 55

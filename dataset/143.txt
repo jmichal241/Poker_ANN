@@ -1,0 +1,19 @@
+Hand nr: 143
+Number of players: 5
+Button on player: 3
+Player 0 have 981 in his stack
+Player 1 have 870 in his stack
+Player 2 have 993 in his stack
+Player 3 have 1088 in his stack
+Player 4 have 1068 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: Q Clubs
+Card 1: 7 Spade
+Player 2 pass
+Player 3 call
+Player 4 call
+Player 0 pass
+Player 1 pass
+The winner is: 3
+The pot was: 35

@@ -1,0 +1,19 @@
+Hand nr: 98
+Number of players: 5
+Button on player: 3
+Player 0 have 1013 in his stack
+Player 1 have 890 in his stack
+Player 2 have 948 in his stack
+Player 3 have 958 in his stack
+Player 4 have 1191 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: A Diamond
+Card 1: K Spade
+Player 2 pass
+Player 3 call
+Player 4 call
+Player 0 raised to 10
+Player 1 raised to 20
+The winner is: 3
+The pot was: 95

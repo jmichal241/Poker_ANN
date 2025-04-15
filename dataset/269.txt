@@ -1,0 +1,19 @@
+Hand nr: 269
+Number of players: 5
+Button on player: 4
+Player 0 have 752 in his stack
+Player 1 have 1015 in his stack
+Player 2 have 1229 in his stack
+Player 3 have 1129 in his stack
+Player 4 have 875 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: J Clubs
+Card 1: 6 Heart
+Player 4 raised to 10
+Player 0 pass
+Player 1 pass
+Player 2 raised to 20
+Player 3 pass
+The winner is: 4
+The pot was: 75

@@ -1,0 +1,19 @@
+Hand nr: 181
+Number of players: 5
+Button on player: 1
+Player 0 have 851 in his stack
+Player 1 have 780 in his stack
+Player 2 have 1348 in his stack
+Player 3 have 1211 in his stack
+Player 4 have 810 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: 5 Heart
+Card 1: 4 Heart
+Player 3 call
+Player 4 raised to 10
+Player 0 pass
+Player 1 pass
+Player 2 pass
+The winner is: 3
+The pot was: 45

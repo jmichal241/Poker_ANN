@@ -1,0 +1,19 @@
+Hand nr: 204
+Number of players: 5
+Button on player: 4
+Player 0 have 766 in his stack
+Player 1 have 740 in his stack
+Player 2 have 1448 in his stack
+Player 3 have 1269 in his stack
+Player 4 have 777 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: J Clubs
+Card 1: 7 Clubs
+Player 4 call
+Player 0 call
+Player 1 pass
+Player 2 call
+Player 3 pass
+The winner are: 2 4 
+The pot was: 45

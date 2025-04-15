@@ -1,0 +1,19 @@
+Hand nr: 633
+Number of players: 5
+Button on player: 3
+Player 0 have 0 in his stack
+Player 1 have 1226 in his stack
+Player 2 have 1571 in his stack
+Player 3 have 1820 in his stack
+Player 4 have 383 in his stack
+Current raise is:20
+Hero is player: 0 his hand is: 
+Card 0: 7 Spade
+Card 1: 4 Diamond
+Player 2 pass
+Player 3 call
+Player 4 raised to 10
+Player 0 pass
+Player 1 raised to 20
+The winner is: 1
+The pot was: 125

@@ -1,0 +1,19 @@
+Hand nr: 27
+Number of players: 5
+Button on player: 2
+Player 0 have 1055 in his stack
+Player 1 have 1015 in his stack
+Player 2 have 1040 in his stack
+Player 3 have 985 in his stack
+Player 4 have 905 in his stack
+Current raise is:10
+Hero is player: 0 his hand is: 
+Card 0: 7 Clubs
+Card 1: 10 Diamond
+Player 0 pass
+Player 1 call
+Player 2 call
+Player 3 call
+Player 4 pass
+The winner is: 3
+The pot was: 45
