@@ -143,7 +143,7 @@ void Table::GameLoop() {
         bigBlind();
         raise = BIG;
         deal();
-
+        heroInfo(handCounter,0);
         int counter = button + 1;
         Action tempAction;
 
@@ -160,7 +160,7 @@ void Table::GameLoop() {
             // Get the action for the current player
             tempAction = currentPlayer->makeAction(raise, pot, button);
 
-            registerAction(currentPlayer->getAction(), raise, currentPlayerIndex);
+            registerAction(currentPlayer->getAction(), raise, currentPlayerIndex, handCounter);
 
             if (tempAction == PASS) {
                 cout << "Player " << currentPlayerIndex << " folded" << endl;
@@ -199,7 +199,7 @@ void Table::GameLoop() {
             cout << "Player " << winner << " ";
         }
         cout << endl;
-
+        registerWin(winners,handCounter);
         // Distribute the pot
         int share = pot / winners.size();
         int remainder = pot % winners.size();
@@ -800,13 +800,14 @@ void Table::createHeader(int handNumber){
         for(int i=0; i<PLAYER;i++){
             plik << "Player " << i << " have " << players[i]->getStack() << " in his stack" << endl;
         }
+        plik << "Current raise is:" << raise << endl;
         plik.close(); // zamykamy plik po zakończeniu operacji
     } else {
         std::cerr << "Nie udalo sie otworzyc pliku do zapisu.\n";
     }
 }
 
-void Table::registerAction(Action action, int raiseMoney, int playerNum){
+void Table::registerAction(Action action, int raiseMoney, int playerNum, int handNumber){
     ifstream inFile("../dane.txt");
     stringstream buffer;
 
@@ -839,6 +840,107 @@ void Table::registerAction(Action action, int raiseMoney, int playerNum){
             outFile << " call" << endl;
         else if(action==RAISE)
             outFile << " raised to " << raise << endl;
+        outFile.close();
+    } else {
+        std::cerr << "Cannot open file to write.\n";
+    }
+}
+
+void Table::registerWin(vector<int>& winners, int handNumber){
+    ifstream inFile("../dane.txt");
+    stringstream buffer;
+
+    if (inFile.is_open()) {
+        buffer << inFile.rdbuf(); // read entire file into buffer
+        inFile.close();
+    } else {
+        std::cerr << "Cannot open file to read.\n";
+    }
+
+    std::string content = buffer.str();
+
+    // Now modify the content
+    size_t pos = content.find("Hand nr: 3");
+    if (pos != std::string::npos) {
+        content.replace(pos, 10, "Hand nr: X");
+    }
+
+    
+    ofstream outFile("../dane.txt"); // open again in write mode
+    if (outFile.is_open()) {
+        outFile << content;
+        if(winners.size()==1){
+            outFile << "The winner is: " << winners[0] << endl;
+        }
+        else{
+            outFile << "The winner are: ";
+            for(int i=0; i< winners.size(); i++){
+                outFile << winners[i] << " ";
+            }
+            outFile << endl;
+            
+        }   
+        outFile << "The pot was: " << pot << endl;
+        outFile.close();
+    } else {
+        std::cerr << "Cannot open file to write.\n";
+    }
+}
+
+void Table::heroInfo(int handNumber, int playerNumber){
+    Card tempHand[2];
+    tempHand[0] = players[playerNumber]->returnCard(0);
+    tempHand[1] = players[playerNumber]->returnCard(1);
+    Colour tempColour[2];
+
+    tempColour[0]=tempHand[0].getColour();
+    tempColour[1]=tempHand[1].getColour();
+
+    ifstream inFile("../dane.txt");
+    stringstream buffer;
+
+    if (inFile.is_open()) {
+        buffer << inFile.rdbuf(); // read entire file into buffer
+        inFile.close();
+    } else {
+        std::cerr << "Cannot open file to read.\n";
+    }
+
+    std::string content = buffer.str();
+
+    // Now modify the content
+    size_t pos = content.find("Hand nr: 3");
+    if (pos != std::string::npos) {
+        content.replace(pos, 10, "Hand nr: X");
+    }
+
+    
+    ofstream outFile("../dane.txt"); // open again in write mode
+    if (outFile.is_open()) {
+        outFile << content;   
+        outFile << "Hero is player: " << playerNumber << " his hand is: " << endl;
+        for(int i=0; i<2;i++){
+            outFile << "Card " << i << ": "; //<< tempHand[i].getNumber() << " " << tempHand[i].getColour() << endl;
+            if(tempHand[i].getNumber()==11)
+                outFile << "J ";
+            else if(tempHand[i].getNumber()==12)
+                outFile << "Q ";
+            else if(tempHand[i].getNumber()==13)
+                outFile << "K ";
+            else if(tempHand[i].getNumber()==14)
+                outFile << "A ";   
+            else 
+                outFile <<  tempHand[i].getNumber() << " ";
+            if(tempHand[i].getColour()==0)
+                outFile << "Spade"; 
+            else if(tempHand[i].getColour()==1)
+                outFile << "Clubs";
+            else if(tempHand[i].getColour()==2)
+                outFile << "Diamond";
+            else
+                outFile << "Heart"; 
+            outFile << endl;
+        }
         outFile.close();
     } else {
         std::cerr << "Cannot open file to write.\n";

@@ -69,8 +69,9 @@ public:
 
     //Creating dataset
     void createHeader(int);
-    void registerAction(Action,int, int);
-    void registerWin(int, int);
+    void registerAction(Action,int, int, int);
+    void registerWin(vector<int>&, int);
+    void heroInfo(int, int);
 };
 
 #endif 

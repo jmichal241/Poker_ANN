@@ -8,23 +8,10 @@ using namespace std;
 
 int main()
 {
-    // Kloziobot player(1000);  // Create a stack-allocated Kloziobot object
-    // player.makeAction(100, 500, 1);  // Calls makeAction on the Kloziobot object (direct call)
-    
-    // Player player(100);
-    // Kloziobot bot1(100);
-    // player.makeAction(100);
+
     Table table;
     table.GameLoop();
-    // table.deal();
-    // table.displayPlayers();
-    // table.smallBlind();
-    // table.bigBlind();
-    // table.displayPlayers(); 
-    // table.passButton();
-    // table.smallBlind();
-    // table.bigBlind();
-    // table.displayPlayers(); 
+
     return 0;
 }
 
@@ -35,3 +22,18 @@ int main()
 // player.getCard(deck.draw());
 // player.getCard(deck.draw());
 // player.display();
+// Kloziobot player(1000);  // Create a stack-allocated Kloziobot object
+// player.makeAction(100, 500, 1);  // Calls makeAction on the Kloziobot object (direct call)
+
+// Player player(100);
+// Kloziobot bot1(100);
+// player.makeAction(100);
+// table.deal();
+// table.displayPlayers();
+// table.smallBlind();
+// table.bigBlind();
+// table.displayPlayers(); 
+// table.passButton();
+// table.smallBlind();
+// table.bigBlind();
+// table.displayPlayers(); 
