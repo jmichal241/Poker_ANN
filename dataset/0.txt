@@ -8,12 +8,12 @@ Player 3 have 1000 in his stack
 Player 4 have 1000 in his stack
 Current raise is:0
 Hero is player: 0 his hand is: 
-Card 0: Q Clubs
-Card 1: 6 Heart
-Player 1 call
-Player 2 call
+Card 0: Q Spade
+Card 1: 9 Spade
 Player 3 call
-Player 4 pass
+Player 4 raised to 10
 Player 0 call
+Player 1 call
+Player 2 pass
 The winner is: 1
-The pot was: 55
+The pot was: 85

@@ -130,7 +130,7 @@ void Table::GameLoop() {
         pot = 0;
 
         // End the game after x hands
-        if (handCounter == 1000) {
+        if (handCounter == 1) {
             break;
         }
         createHeader(handCounter);
@@ -146,7 +146,7 @@ void Table::GameLoop() {
         raise = BIG;
         deal();
         heroInfo(handCounter,0);
-        int counter = button + 1;
+        int counter = button + 3;
         Action tempAction;
 
         while (allActionMade() == 0) {
@@ -238,7 +238,6 @@ void Table::GameLoop() {
 
     cout << "Game ended after " << handCounter << " hands." << endl;
 }
-
 
 void Table::displayBoard(){
     cout << "Board: " << endl;
@@ -792,7 +791,7 @@ vector<int> Table::defineWinner() {
 }
    
 void Table::createHeader(int handNumber){
-    string fileName = "../dataset/" + std::to_string(handNumber) + ".txt";
+    string fileName = "dataset/" + std::to_string(handNumber) + ".txt";
     ofstream plik(fileName);
 
     if (plik.is_open()) {
@@ -811,7 +810,7 @@ void Table::createHeader(int handNumber){
 }
 
 void Table::registerAction(Action action, int raiseMoney, int playerNum, int handNumber){
-    string fileName = "../dataset/" + std::to_string(handNumber) + ".txt";
+    string fileName = "dataset/" + std::to_string(handNumber) + ".txt";
     ifstream inFile(fileName);
     stringstream buffer;
 
@@ -851,7 +850,7 @@ void Table::registerAction(Action action, int raiseMoney, int playerNum, int han
 }
 
 void Table::registerWin(vector<int>& winners, int handNumber){
-    string fileName = "../dataset/" + std::to_string(handNumber) + ".txt";
+    string fileName = "dataset/" + std::to_string(handNumber) + ".txt";
     ifstream inFile(fileName);
     stringstream buffer;
 
@@ -893,15 +892,11 @@ void Table::registerWin(vector<int>& winners, int handNumber){
 }
 
 void Table::heroInfo(int handNumber, int playerNumber){
-    string fileName = "../dataset/" + std::to_string(handNumber) + ".txt";
+    string fileName = "dataset/" + std::to_string(handNumber) + ".txt";
 
     Card tempHand[2];
     tempHand[0] = players[playerNumber]->returnCard(0);
     tempHand[1] = players[playerNumber]->returnCard(1);
-    Colour tempColour[2];
-
-    tempColour[0]=tempHand[0].getColour();
-    tempColour[1]=tempHand[1].getColour();
 
     ifstream inFile(fileName);
     stringstream buffer;

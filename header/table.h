@@ -14,10 +14,6 @@
 #include "lukibot.h"
 
 
-
-
-
-
 enum GameStatus {
     PREFLOP,
     FLOP,
