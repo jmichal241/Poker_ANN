@@ -56,7 +56,7 @@ public:
     int getPot();
     int getRaise();
     int getButton();
-
+ 
     //Methods to define winners
     vector<int> defineHand(Player);   //check how strong is your hand
     vector<int> defineWinner();       //define who wins this hand
