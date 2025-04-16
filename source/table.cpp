@@ -153,7 +153,7 @@ void Table::GameLoop() {
         pot = 0;
         random_number = distrib(gen)%5;
         // End the game after x hands
-        if (handCounter == 100) {
+        if (handCounter == 10) {
             break;
         }
         raise = BIG;
@@ -901,7 +901,7 @@ void Table::registerWin(vector<int>& winners, int handNumber){
             outFile << "\"winner\": [" << winners[0] << "], " << endl;
         }
         else{
-            outFile << "\"winners\": [";
+            outFile << "\"winner\": [";
             for(int i=0; i< winners.size(); i++){
                 if(i==winners.size()-1)
                     outFile << winners[i] << "]";

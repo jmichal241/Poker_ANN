@@ -32,17 +32,35 @@ class PokerDataset(Dataset):
 
                     # Previous actions (padding if needed)
                     actions = game["actions"]
-                    max_actions = 10  # Możesz ustawić dowolny limit na liczbę akcji, np. 10
+                    max_actions = 1 # Limit for number of actions
 
-                    # Dodajemy wszystkie akcje do x
-                    for action in actions[:max_actions]:
-                        x.append(action["player"])
-                        x.append(ACTION_MAP[action["action"]])
+                    # Add actual actions
+                    for action in actions:
+                        x.append(action["player"])  # Gracz wykonujący akcję
+                        x.append(ACTION_MAP[action["action"]])  # Akcja gracza
 
-                    # Padding, jeśli akcji jest mniej niż max_actions
+                        # If it's a 'raise' action, add the amount
+                        if action["action"] == "raise":
+                            x.append(action["amount"])
+                        else:
+                            x.append(0)  # If it's not 'raise', add 0 as the amount
+
+                    # Padding for actions if necessary
                     for _ in range(max_actions - len(actions)):
-                        x.extend([0, 0])  # [0, 0] dla gracza i akcji
+                        x.extend([0, 0, 0])  # [0, 0, 0] for missing player, action, and amount
 
+
+                    # Add the result information (winner and pot)
+                    winner = game["winner"]
+                    if isinstance(winner, list):
+                        x.append(len(winner))  # Liczba zwycięzców
+                        for w in winner:
+                            x.append(w)  # Dodajemy indeks każdego zwycięzcy
+                    else:
+                        x.append(1)  # Jeden zwycięzca
+                        x.append(winner)  # Dodajemy numer zwycięzcy
+
+                    x.append(game["pot"])  # Dodajemy wartość puli
 
                     self.data.append(torch.tensor(x, dtype=torch.float))
 
