@@ -151,7 +151,7 @@ void Table::GameLoop() {
     while (true) {
         vector<int> winners;
         pot = 0;
-        random_number = distrib(gen);
+        random_number = distrib(gen)%5;
         // End the game after x hands
         if (handCounter == 100) {
             break;
@@ -162,7 +162,7 @@ void Table::GameLoop() {
         status = PREFLOP; 
         // Reset hands for all players
         prepareTable();
-        heroInfo(handCounter,0);
+        heroInfo(handCounter,random_number);
         int counter = button + 3;
         Action tempAction;
 
