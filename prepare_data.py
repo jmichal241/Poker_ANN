@@ -7,9 +7,10 @@ SUIT_MAP = {"Spade": 0, "Clubs": 1, "Diamond": 2, "Heart": 3}
 ACTION_MAP = {"pass": 0, "call": 1, "check": 2, "raise": 3}
 
 class PokerDataset(Dataset):
-    def __init__(self, folder_path):
+    def __init__(self, folder_path, max_actions=10):
         self.data = []
         self.labels = []
+        self.max_actions = max_actions
 
         for filename in os.listdir(folder_path):
             if filename.endswith(".json"):
@@ -30,41 +31,40 @@ class PokerDataset(Dataset):
                         x.append(card["card"])  # value (2-14)
                         x.append(SUIT_MAP[card["suit"]])  # suit (0-3)
 
-                    # Previous actions (padding if needed)
+                    # Count of real actions
                     actions = game["actions"]
-                    max_actions = 1 # Limit for number of actions
+                    x.append(len(actions))  # <-- NEW: real number of actions
 
                     # Add actual actions
                     for action in actions:
                         x.append(action["player"])  # Gracz wykonujący akcję
                         x.append(ACTION_MAP[action["action"]])  # Akcja gracza
-
-                        # If it's a 'raise' action, add the amount
-                        if action["action"] == "raise":
-                            x.append(action["amount"])
-                        else:
-                            x.append(0)  # If it's not 'raise', add 0 as the amount
+                        x.append(action.get("amount", 0)) if action["action"] == "raise" else x.append(0)
 
                     # Padding for actions if necessary
-                    for _ in range(max_actions - len(actions)):
-                        x.extend([0, 0, 0])  # [0, 0, 0] for missing player, action, and amount
+                    for _ in range(self.max_actions - len(actions)):
+                        x.extend([-1, -1, -1])  # padding
 
-
-                    # Add the result information (winner and pot)
+                    # Add result (winner and pot)
                     winner = game["winner"]
                     if isinstance(winner, list):
-                        x.append(len(winner))  # Liczba zwycięzców
+                        x.append(len(winner))  # liczba zwycięzców
                         for w in winner:
-                            x.append(w)  # Dodajemy indeks każdego zwycięzcy
+                            x.append(w)
+                        # padding do 6 graczy (jeśli np. tylko 2 wygrało)
+                        for _ in range(6 - len(winner)):
+                            x.append(-1)
                     else:
-                        x.append(1)  # Jeden zwycięzca
-                        x.append(winner)  # Dodajemy numer zwycięzcy
+                        x.append(1)  # jeden zwycięzca
+                        x.append(winner)
+                        for _ in range(5):  # padding żeby było zawsze 6 pozycji
+                            x.append(-1)
 
-                    x.append(game["pot"])  # Dodajemy wartość puli
+                    x.append(game["pot"])
 
                     self.data.append(torch.tensor(x, dtype=torch.float))
 
-                    # Extract hero action as label
+                    # Label = pierwsza akcja bohatera
                     hero_action = next(a for a in game["actions"] if a["player"] == hero_info["player"])
                     self.labels.append(torch.tensor(ACTION_MAP[hero_action["action"]], dtype=torch.long))
 
@@ -75,24 +75,14 @@ class PokerDataset(Dataset):
         return self.data[idx], self.labels[idx]
 
     def get_player_hand(self, idx):
-        """
-        Funkcja zwraca numer gracza (ręki) dla danego `sample`.
-        """
-        # Odzyskujemy dane z pliku, na podstawie indeksu
         game_data = self.data[idx]
-        # Gracz (player) jest zapisany w pierwszym elemencie (po Hero_info), 
-        # gdzie zapisujemy numer gracza.
-        player_idx = int(game_data[3])  # To jest 'player' z Hero_info
-        return player_idx
+        return int(game_data[3])  # player z Hero_info
 
 
-# Example usage
 if __name__ == "__main__":
     dataset = PokerDataset("dataset")
     print(f"Loaded {len(dataset)} hands.")
     print("Sample input:", dataset[0][0])
     print("Sample label:", dataset[0][1])
-
-    # Sprawdzanie, która ręka jest przypisana do danego sample
-    hand_player = dataset.get_player_hand(0)  # Sprawdzamy rękę dla pierwszego sample
+    hand_player = dataset.get_player_hand(0)
     print(f"The sample hand belongs to player: {hand_player}")

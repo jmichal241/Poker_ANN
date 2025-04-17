@@ -153,7 +153,7 @@ void Table::GameLoop() {
         pot = 0;
         random_number = distrib(gen)%5;
         // End the game after x hands
-        if (handCounter == 10) {
+        if (handCounter == 1000) {
             break;
         }
         raise = BIG;

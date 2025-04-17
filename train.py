@@ -1,63 +1,64 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
-import numpy as np
-from rnn import PokerRNN
+from torch.utils.data import DataLoader
+from prepare_data import PokerDataset
 
-# Parametry
-input_size = 30
-hidden_size = 128
-output_size = 3
-seq_length = 5
-num_layers = 1
-learning_rate = 0.001
-num_epochs = 500
-batch_size = 32
 
-# Dummy dane
-def generate_dummy_data(num_samples=500):
-    X = np.random.rand(num_samples, seq_length, input_size).astype(np.float32)
-    y = np.random.randint(0, output_size, size=(num_samples,))
-    return torch.tensor(X), torch.tensor(y)
+# === Model sieci neuronowej ===
+class PokerNet(nn.Module):
+    def __init__(self, input_size, hidden_size=64, output_size=4):
+        super(PokerNet, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, hidden_size)
+        self.out = nn.Linear(hidden_size, output_size)
 
-X, y = generate_dummy_data()
+    def forward(self, x):
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        return self.out(x)
 
-dataset = torch.utils.data.TensorDataset(X, y)
-loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+def forward(self, x):
+    # Create a mask to ignore padding (value -1)
+    mask = (x != -1).float()  # Mask will be 1 where it's not padding, 0 where it's padding
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = PokerRNN(input_size, hidden_size, output_size, num_layers).to(device)
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    x = torch.relu(self.fc1(x))
+    x = torch.relu(self.fc2(x))
 
-for epoch in range(num_epochs):
-    total_loss = 0
-    for batch_X, batch_y in loader:
-        batch_X, batch_y = batch_X.to(device), batch_y.to(device)
+    # Multiply by the mask to ignore padding during the final layer
+    x = x * mask[:, :x.size(1)]  # Ensure the mask matches the size of the output
 
-        outputs = model(batch_X)
-        loss = criterion(outputs, batch_y)
+    x = self.fc3(x)
+    return x
+# === Funkcja trenująca ===
+def train_model(dataset, model, epochs=1000, batch_size=32, learning_rate=0.001):
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-        total_loss += loss.item()
+    for epoch in range(epochs):
+        total_loss = 0.0
+        for inputs, labels in dataloader:
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
 
-    print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {total_loss:.4f}")
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-# Testowanie modelu po treningu
-model.eval()  # Przełącza model w tryb ewaluacji
+            total_loss += loss.item()
 
-# Przykładowe dane do testowania
-test_data, test_labels = generate_dummy_data(5)  # 5 próbek testowych
-test_data, test_labels = test_data.to(device), test_labels.to(device)
+        print(f"Epoch {epoch + 1}/{epochs}, Loss: {total_loss:.4f}")
 
-with torch.no_grad():  # Nie musimy śledzić gradientów przy testowaniu
-    predictions = model(test_data)
 
-# Drukowanie wyników
-for i in range(len(predictions)):
-    print(f"Przykład {i+1}:")
-    print(f"  Prawdziwa etykieta: {test_labels[i].item()}")
-    print(f"  Predykcja: {predictions[i].argmax().item()}")
+# === Główna sekcja ===
+if __name__ == "__main__":
+    dataset = PokerDataset("dataset")
+    print(f"Loaded {len(dataset)} hands.")
+
+    input_size = len(dataset[0][0])
+    model = PokerNet(input_size=input_size)
+
+    train_model(dataset, model, epochs=1000)
