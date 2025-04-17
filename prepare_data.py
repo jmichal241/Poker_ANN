@@ -7,7 +7,7 @@ SUIT_MAP = {"Spade": 0, "Clubs": 1, "Diamond": 2, "Heart": 3}
 ACTION_MAP = {"pass": 0, "call": 1, "check": 2, "raise": 3}
 
 class PokerDataset(Dataset):
-    def __init__(self, folder_path, max_actions=10):
+    def __init__(self, folder_path, max_actions=15):
         self.data = []
         self.labels = []
         self.max_actions = max_actions
@@ -65,7 +65,16 @@ class PokerDataset(Dataset):
                     self.data.append(torch.tensor(x, dtype=torch.float))
 
                     # Label = pierwsza akcja bohatera
-                    hero_action = next(a for a in game["actions"] if a["player"] == hero_info["player"])
+                    hero_action = None
+                    for action in game["actions"]:
+                        if action["player"] == hero_info["player"]:
+                            hero_action = action
+                            break
+
+                    if hero_action is None:
+                        print(f"No action found for hero {hero_info['player']} in game {filename}. Skipping this game.")
+                        continue  # Pomiń tę grę
+
                     self.labels.append(torch.tensor(ACTION_MAP[hero_action["action"]], dtype=torch.long))
 
     def __len__(self):

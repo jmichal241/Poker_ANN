@@ -20,9 +20,11 @@ void Player::getCard(Card card){
     else 
         hand[1]=card;
 }
+
 void Player::resetRaise(){
     Raise=0;
 }
+
 void Player::resetHand(){
     hand[0].setNumber(0);
     hand[0].setColour(SPADE);
@@ -31,15 +33,23 @@ void Player::resetHand(){
     action=NONE;
     potAgency=0;
 }
+
 void Player::changeStack(int change){
     stack = stack + change;
 }
+
+void Player::setStack(int newStack){
+    stack = newStack;
+}   
+
 void Player::changeButton(bool change){
     button = change;
 }
+
 int Player::getStack(){
     return stack;
 }
+
 void Player::call(){
     action=CALL;
 }
@@ -47,6 +57,7 @@ void Player::call(){
 void Player::check(){
     action=CHECK;
 }
+
 void Player::pass(){
     action=PASS;
 }
@@ -59,6 +70,7 @@ void Player::raise(int number){
 Action Player::getAction(){
     return action;
 }
+
 void Player::setAction(Action action) {
     this->action = action; // Set the player's action
 }

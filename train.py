@@ -5,7 +5,6 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from prepare_data import PokerDataset
 
-
 # === Model sieci neuronowej ===
 class PokerNet(nn.Module):
     def __init__(self, input_size, hidden_size=64, output_size=4):
@@ -15,25 +14,26 @@ class PokerNet(nn.Module):
         self.out = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        return self.out(x)
+        # Apply first layer
+        x = torch.relu(self.fc1(x))
 
-def forward(self, x):
-    # Create a mask to ignore padding (value -1)
-    mask = (x != -1).float()  # Mask will be 1 where it's not padding, 0 where it's padding
+        # Apply second layer
+        x = torch.relu(self.fc2(x))
 
-    x = torch.relu(self.fc1(x))
-    x = torch.relu(self.fc2(x))
+        # Apply the final output layer
+        x = self.out(x)
+        return x
 
-    # Multiply by the mask to ignore padding during the final layer
-    x = x * mask[:, :x.size(1)]  # Ensure the mask matches the size of the output
 
-    x = self.fc3(x)
-    return x
+
+
 # === Funkcja trenująca ===
-def train_model(dataset, model, epochs=1000, batch_size=32, learning_rate=0.001):
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+def train_model(dataset, model, epochs=1000, batch_size=32, learning_rate=0.001, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')):
+    # Move model to the device (GPU/CPU)
+    model.to(device)
+    
+    # Use DataLoader with more workers to parallelize data loading
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -41,9 +41,14 @@ def train_model(dataset, model, epochs=1000, batch_size=32, learning_rate=0.001)
     for epoch in range(epochs):
         total_loss = 0.0
         for inputs, labels in dataloader:
+            # Move data to the device (GPU/CPU)
+            inputs, labels = inputs.to(device, non_blocking=True), labels.to(device, non_blocking=True)
+
+            # Forward pass
             outputs = model(inputs)
             loss = criterion(outputs, labels)
 
+            # Backward pass and optimization
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -61,4 +66,5 @@ if __name__ == "__main__":
     input_size = len(dataset[0][0])
     model = PokerNet(input_size=input_size)
 
-    train_model(dataset, model, epochs=1000)
+    train_model(dataset, model, epochs=1000, batch_size=64)
+

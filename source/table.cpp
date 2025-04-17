@@ -38,6 +38,8 @@ void Table::river(){
 void Table::resetboard(){
     for(int i=0; i<PLAYER; i++){
         players[i]->resetHand();
+        players[i]->setStack(STACK_SIZE);
+        
     }
     pot=0;
     for(int i=0; i<5; i++){
@@ -153,7 +155,10 @@ void Table::GameLoop() {
         pot = 0;
         random_number = distrib(gen)%5;
         // End the game after x hands
-        if (handCounter == 1000) {
+        if (handCounter%500==0){
+            resetboard();
+        }
+        if (handCounter == 100000) {
             break;
         }
         raise = BIG;

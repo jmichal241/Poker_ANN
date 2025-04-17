@@ -34,6 +34,7 @@ public:
     void resetHand();
     void changeStack(int);
     void changeButton(bool);
+    void setStack(int);
     int getStack();
     Card returnCard(int);
     void changePotAgency(int);
