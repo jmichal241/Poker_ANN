@@ -3,12 +3,13 @@
 #define PLAYER 5
 #define SMALL 5
 #define BIG 10
+#define MAXHANDS 2
 
 // In Table class constructor (table.cpp)
 Table::Table() {
-    players.push_back(new Kloziobot(STACK_SIZE));  // Use pointer to store Kloziobot
+    players.push_back(new Lukibot(STACK_SIZE));  // Use pointer to store Kloziobot
     players[0]->resetHand();  // Reset hand for Kloziobot
-    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the second player
+    players.push_back(new GPT1bot(STACK_SIZE));  // Add another Kloziobot as the second player
     players[1]->resetHand();  // Reset hand for the second Kloziobot
     players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
     players[2]->resetHand();  // Reset hand for the third Kloziobot
@@ -120,7 +121,7 @@ int Table::allActionMade(){
         }
     }
     for(int i = 0; i < PLAYER; i++){
-        if(players[i]->getAction()==CALL && players[i]->getRaise()!=highestRaise){
+        if(players[i]->getAction()==CALL && players[i]->getPotAgency()!=highestRaise){
             flag=0;
             break;
         }
@@ -151,14 +152,15 @@ void Table::GameLoop() {
     int random_number;
 
     while (true) {
+        if (handCounter%500==0){
+            resetboard();
+        }   
         vector<int> winners;
         pot = 0;
         random_number = distrib(gen)%5;
         // End the game after x hands
-        if (handCounter%500==0){
-            resetboard();
-        }
-        if (handCounter == 80000) {
+
+        if (handCounter == MAXHANDS){
             break;
         }
         raise = BIG;
@@ -242,7 +244,7 @@ void Table::GameLoop() {
 
         cout << "Pot (" << pot << ") has been distributed among the winners." << endl;
         displayPlayers();
-
+        displayBoard();
         // Check if only one player has enough stack to continue
         int playerCounter = 0;
         for (int i = 0; i < PLAYER; i++) {
@@ -819,7 +821,16 @@ vector<int> Table::defineWinner() {
 }
    
 void Table::createHeader(int handNumber, int playerNum){
-    string fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
+    string fileName;  
+
+    if(handNumber<MAXHANDS*0.8)
+        fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
+    else if (handNumber<MAXHANDS*0.9)
+        fileName = "dataset/valid/" + std::to_string(handNumber) + ".json";
+    else if (handNumber<MAXHANDS)
+        fileName = "dataset/test/" + std::to_string(handNumber) + ".json";
+
+    
     ofstream plik(fileName);
     playerNum=playerNum%PLAYER;
     if (plik.is_open()) {
@@ -835,7 +846,14 @@ void Table::createHeader(int handNumber, int playerNum){
 }
 
 void Table::registerAction(Action action, int raiseMoney, int playerNum, int handNumber){
-    string fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
+    string fileName;  
+
+    if(handNumber<MAXHANDS*0.8)
+        fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
+    else if (handNumber<MAXHANDS*0.9)
+        fileName = "dataset/valid/" + std::to_string(handNumber) + ".json";
+    else if (handNumber<MAXHANDS)
+        fileName = "dataset/test/" + std::to_string(handNumber) + ".json";
     ifstream inFile(fileName);
     stringstream buffer;
 
@@ -877,7 +895,14 @@ void Table::registerAction(Action action, int raiseMoney, int playerNum, int han
 }
 
 void Table::registerWin(vector<int>& winners, int handNumber){
-    string fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
+    string fileName;  
+
+    if(handNumber<MAXHANDS*0.8)
+        fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
+    else if (handNumber<MAXHANDS*0.9)
+        fileName = "dataset/valid/" + std::to_string(handNumber) + ".json";
+    else if (handNumber<MAXHANDS)
+        fileName = "dataset/test/" + std::to_string(handNumber) + ".json";
     ifstream inFile(fileName);
     stringstream buffer;
 
@@ -925,7 +950,14 @@ void Table::registerWin(vector<int>& winners, int handNumber){
 }
 
 void Table::heroInfo(int handNumber, int playerNumber){
-    string fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
+    string fileName;  
+
+    if(handNumber<MAXHANDS*0.8)
+        fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
+    else if (handNumber<MAXHANDS*0.9)
+        fileName = "dataset/valid/" + std::to_string(handNumber) + ".json";
+    else if (handNumber<MAXHANDS)
+        fileName = "dataset/test/" + std::to_string(handNumber) + ".json";
 
     Card tempHand[2];
     tempHand[0] = players[playerNumber]->returnCard(0);

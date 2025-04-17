@@ -8,6 +8,10 @@ Lukibot::Lukibot(int initialStack) : Player(initialStack) {}
 
 Action Lukibot::makeAction(int raiseMoney, int pot, int tableButton) {
 
+    if(stack<=0){
+        setAction(PASS);
+        return PASS;
+    }
     setAction(CALL);
     return CALL;
 
