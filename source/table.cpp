@@ -158,7 +158,7 @@ void Table::GameLoop() {
         if (handCounter%500==0){
             resetboard();
         }
-        if (handCounter == 100000) {
+        if (handCounter == 80000) {
             break;
         }
         raise = BIG;
@@ -819,7 +819,7 @@ vector<int> Table::defineWinner() {
 }
    
 void Table::createHeader(int handNumber, int playerNum){
-    string fileName = "dataset/" + std::to_string(handNumber) + ".json";
+    string fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
     ofstream plik(fileName);
     playerNum=playerNum%PLAYER;
     if (plik.is_open()) {
@@ -835,7 +835,7 @@ void Table::createHeader(int handNumber, int playerNum){
 }
 
 void Table::registerAction(Action action, int raiseMoney, int playerNum, int handNumber){
-    string fileName = "dataset/" + std::to_string(handNumber) + ".json";
+    string fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
     ifstream inFile(fileName);
     stringstream buffer;
 
@@ -877,7 +877,7 @@ void Table::registerAction(Action action, int raiseMoney, int playerNum, int han
 }
 
 void Table::registerWin(vector<int>& winners, int handNumber){
-    string fileName = "dataset/" + std::to_string(handNumber) + ".json";
+    string fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
     ifstream inFile(fileName);
     stringstream buffer;
 
@@ -925,7 +925,7 @@ void Table::registerWin(vector<int>& winners, int handNumber){
 }
 
 void Table::heroInfo(int handNumber, int playerNumber){
-    string fileName = "dataset/" + std::to_string(handNumber) + ".json";
+    string fileName = "dataset/train/" + std::to_string(handNumber) + ".json";
 
     Card tempHand[2];
     tempHand[0] = players[playerNumber]->returnCard(0);
