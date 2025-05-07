@@ -3,7 +3,6 @@
 #include <cstdlib>  // For random actions, if needed
 #define BIG 10
 
-// In Kloziobot constructor
 Lukibot::Lukibot(int initialStack) : Player(initialStack) {}
 
 Action Lukibot::makeAction(int raiseMoney, int pot, int tableButton) {
@@ -39,10 +38,36 @@ Action Lukibot::makeAction(int raiseMoney, int pot, int tableButton) {
     if (hand[0].getNumber() == 14) handScore += aceBonus;
     if (hand[1].getNumber() == 14) handScore += aceBonus;
 
+    // Easter egg: special bonus for 2-7 off color
     if (lowerCardValue == 2 &&
         higherCardValue == 7 &&
         hand[0].getColour() != hand[1].getColour()) handScore += 3;
 
+    if (stack <= 0) {
+        setAction(PASS);
+        return PASS;
+    }
+
+    if (handScore < 5 && raiseMoney > 0) {
+        setAction(PASS);
+        return PASS;
+    }
+
+    // call threshold
+    if (handScore >= 5 && handScore <= 11) {
+        setAction(CALL);
+        return CALL;
+    }
+
+    // raise threshold
+    if (handScore > 11 && stack > raiseMoney + BIG) {
+        int raiseAmount = raiseMoney + BIG;
+        this->raise(raiseAmount);
+        return RAISE;
+    }
+
+    setAction(CALL);
+    return CALL;
 
 
     // placement
