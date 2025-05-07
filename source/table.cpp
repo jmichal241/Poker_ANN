@@ -9,9 +9,9 @@
 Table::Table() {
     players.push_back(new Lukibot(STACK_SIZE));  // Use pointer to store Kloziobot
     players[0]->resetHand();  // Reset hand for Kloziobot
-    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the second player
+    players.push_back(new GPT1bot(STACK_SIZE));  // Add another Kloziobot as the second player
     players[1]->resetHand();  // Reset hand for the second Kloziobot
-    players.push_back(new Lukibot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players.push_back(new GPT2bot(STACK_SIZE));  // Add another Kloziobot as the third player
     players[2]->resetHand();  // Reset hand for the third Kloziobot
     players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
     players[3]->resetHand(); 
@@ -64,9 +64,10 @@ void Table::smallBlind() {
     int temp = (button + 1) % PLAYER;
 
     if (players[temp]->getStack() > 0) {
-        players[temp]->changeStack(-SMALL);
-        players[temp]->changePotAgency(SMALL);
-        pot += SMALL;
+        int blindAmount = min(SMALL, players[temp]->getStack());
+        players[temp]->changeStack(-blindAmount);
+        players[temp]->changePotAgency(blindAmount);
+        pot += blindAmount;
     }
 }
 
@@ -75,9 +76,10 @@ void Table::bigBlind() {
 
 
     if (players[temp]->getStack() > 0) {
-        players[temp]->changeStack(-BIG);
-        players[temp]->changePotAgency(BIG);
-        pot += BIG;
+        int blindAmount = min(BIG, players[temp]->getStack());
+        players[temp]->changeStack(-blindAmount);
+        players[temp]->changePotAgency(blindAmount);
+        pot += blindAmount;
     }
 }
 
