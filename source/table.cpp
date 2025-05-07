@@ -3,15 +3,15 @@
 #define PLAYER 5
 #define SMALL 5
 #define BIG 10
-#define MAXHANDS 2
+#define MAXHANDS 300
 
 // In Table class constructor (table.cpp)
 Table::Table() {
     players.push_back(new Lukibot(STACK_SIZE));  // Use pointer to store Kloziobot
     players[0]->resetHand();  // Reset hand for Kloziobot
-    players.push_back(new GPT1bot(STACK_SIZE));  // Add another Kloziobot as the second player
+    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the second player
     players[1]->resetHand();  // Reset hand for the second Kloziobot
-    players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
+    players.push_back(new Lukibot(STACK_SIZE));  // Add another Kloziobot as the third player
     players[2]->resetHand();  // Reset hand for the third Kloziobot
     players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
     players[3]->resetHand(); 
@@ -154,7 +154,7 @@ void Table::GameLoop() {
     while (true) {
         if (handCounter%500==0){
             resetboard();
-        }   
+        }
         vector<int> winners;
         pot = 0;
         random_number = distrib(gen)%5;
@@ -166,7 +166,7 @@ void Table::GameLoop() {
         raise = BIG;
         createHeader(handCounter, random_number);
 
-        status = PREFLOP; 
+        status = PREFLOP;
         // Reset hands for all players
         prepareTable();
         heroInfo(handCounter,random_number);
@@ -174,47 +174,56 @@ void Table::GameLoop() {
         Action tempAction;
 
         while (allActionMade() == 0) {
-            // Get the current player
             int currentPlayerIndex = (counter) % PLAYER;
             Player* currentPlayer = players[currentPlayerIndex];
 
-            // if(currentPlayer->getRaise()==raise){
-            //     break;
-            // }
-            // Get the action for the current player
-            if(currentPlayer->getAction()==PASS){
+            if (currentPlayer->getAction() == PASS) {
                 counter++;
                 continue;
             }
+
             tempAction = currentPlayer->makeAction(raise, pot, button);
 
-            if (tempAction == PASS) {
-                cout << "Player " << currentPlayerIndex << " folded" << endl;
-            } else {
-                // Handle RAISE action
-                if (tempAction == RAISE) {
-                    int temp=0;
-                    raise = currentPlayer->getRaise();
-                    temp=raise-currentPlayer->getPotAgency();
-                    currentPlayer->changeStack(-temp);
+            if (tempAction == RAISE) {
+                int newRaise = currentPlayer->getRaise();
+                int toPay = newRaise - currentPlayer->getPotAgency();
+
+                // you have to have enough money and cant raise by less than BIG
+                if (newRaise >= raise + BIG && currentPlayer->getStack() >= toPay) {
+                    raise = newRaise;
+                    currentPlayer->changeStack(-toPay);
+                    pot += toPay;
+                    currentPlayer->changePotAgency(raise);
+                    currentPlayer->setAction(RAISE);
                     cout << "Player " << currentPlayerIndex << " raised to " << raise << endl;
-                    pot += temp;
-                    currentPlayer->changePotAgency(raise);
-                } 
-                // Handle CALL action
-                else if (tempAction == CALL) {
-                    int temp=0;
-                    temp=raise-currentPlayer->getPotAgency();
-                    currentPlayer->changeStack(-temp);
-                    pot += temp;
-                    cout << "Player " << currentPlayerIndex << " called " << raise << endl;
-                    currentPlayer->changePotAgency(raise);
+                } else { //if we cant raise we call
+                    tempAction = CALL;
                 }
             }
-            counter++; // Move to the next player
+
+            // CALL
+            if (tempAction == CALL) {
+                int callAmount = raise - currentPlayer->getPotAgency();
+                if (currentPlayer->getStack() >= callAmount) {
+                    currentPlayer->changeStack(-callAmount);
+                    pot += callAmount;
+                    currentPlayer->changePotAgency(raise);
+                    currentPlayer->setAction(CALL);
+                    cout << "Player " << currentPlayerIndex << " called " << raise << endl;
+                } else { //if not enough money we pass
+                    tempAction = PASS;
+                }
+            }
+
+            // PASS (jeden uniwersalny blok)
+            if (tempAction == PASS) {
+                currentPlayer->setAction(PASS);
+                cout << "Player " << currentPlayerIndex << " folded" << endl;
+            }
+
+            counter++;
             registerAction(currentPlayer->getAction(), raise, currentPlayerIndex, handCounter);
         }
-
         // Handle community cards (flop, turn, river)
         status = FLOP;
         flop();
