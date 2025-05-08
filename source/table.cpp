@@ -174,7 +174,7 @@ void Table::GameLoop() {
 
     while (true) {
         resetHand();
-        bool someoneWentAllIn = false;
+        bool someoneWentAllIn = false; // for side pots
         sidePotAmounts.clear();
         sidePotEligible.clear();
         if (handCounter%500==0){
@@ -227,6 +227,7 @@ void Table::GameLoop() {
                     // treat as CALL if raise too small but player has enough to call
                     tempAction = CALL;
                 } else {
+                    //if not enough money for call then all-in
                     tempAction = ALL_IN;
                 }
             }
@@ -282,7 +283,7 @@ void Table::GameLoop() {
 
         int originalPot = pot;
     if (someoneWentAllIn) {
-    // 1) Zbierz unikalne poziomy inwestycji i posortuj rosnąco
+    // 1) Collect each player's total investment and build a sorted list of unique bet levels
     std::set<int> uniqueLevels;
     for (int i = 0; i < PLAYER; ++i) {
         if (players[i]->getAction() != PASS)
@@ -292,11 +293,12 @@ void Table::GameLoop() {
     std::sort(levels.begin(), levels.end());
 
     int prevLevel = 0;
-    int mainLevel = levels[0];
-    int mainPotAmt = 0;
-    std::vector<int> mainContrib;
+    int mainLevel = levels[0];  // The smallest investment becomes the main‐pot cutoff
+    int mainPotAmt = 0;         // // Accumulate total money in the main pot
+    std::vector<int> mainContrib;   // // list of players eligible for the main pot
 
-    // 2) Oblicz main pot (dla najniższego poziomu)
+        // 2) Calculate the main pot: for each player who invested at least mainLevel,
+        //    they contribute (mainLevel - prevLevel) chips to the main pot.
     for (int i = 0; i < PLAYER; ++i) {
         if (players[i]->getAction() != PASS) {
             int inv = players[i]->getInvestment();
@@ -308,13 +310,13 @@ void Table::GameLoop() {
     }
     prevLevel = mainLevel;
 
-    // 3) Oblicz każdy side pot
-        sidePotEligible.clear();
+        // 3) Build side pots for each higher investment level
+        sidePotEligible.clear();    // Reset previous data
         sidePotAmounts.clear();
     for (size_t lvlIdx = 1; lvlIdx < levels.size(); ++lvlIdx) {
         int lvl = levels[lvlIdx];
         int sideAmt = 0;
-        std::vector<int> contrib;
+        std::vector<int> contrib;       // Players eligible for this side pot
         for (int i = 0; i < PLAYER; ++i) {
             if (players[i]->getAction() != PASS && players[i]->getInvestment() >= lvl) {
                 sideAmt += (lvl - prevLevel);
@@ -328,7 +330,7 @@ void Table::GameLoop() {
         }
     }
 
-    // 4) (Opcjonalnie) weryfikacja sumy:
+    // Verify that main + all side pots sum to the original pot
     {
         int totalSide = std::accumulate(sidePotAmounts.begin(), sidePotAmounts.end(), 0);
         if (mainPotAmt + totalSide != originalPot) {
@@ -365,21 +367,40 @@ void Table::GameLoop() {
             }
         }
     } else {
-        // 6) if no all-ins
-        std::vector<int> contenders;
+        // 1) Collect everyone still in (non-folded who put chips in)
+        std::vector<int> eligible;
         for (int i = 0; i < PLAYER; ++i) {
-            if (players[i]->getAction() != PASS) {
-                contenders.push_back(i);
+            if (players[i]->getAction() != PASS
+                && players[i]->getInvestment() > 0) {
+                eligible.push_back(i);
+                }
+        }
+
+        // 2) If nobody is “eligible”, that means everyone except one folded (prevents crash when everybody folds)
+        if (eligible.empty()) {
+            // find the last non-folded player
+            for (int i = 0; i < PLAYER; ++i) {
+                if (players[i]->getAction() != PASS) {
+                    players[i]->changeStack(pot);
+                    std::cout << "Player " << i
+                              << " wins " << pot
+                              << " (everyone else folded)\n";
+                    break;
+                }
             }
         }
-        auto winners = defineWinnerAmong(contenders);
-        int share = pot / winners.size();
-        int rem   = pot % winners.size();
-        for (size_t j = 0; j < winners.size(); ++j) {
-            int win = share + (j == 0 ? rem : 0);
-            players[winners[j]]->changeStack(win);
-            std::cout << "Player " << winners[j]
-                      << " wins " << win << " from pot\n";
+        // 3) Otherwise do a normal showdown split
+        else {
+            auto winners = defineWinnerAmong(eligible);
+            int share = pot / static_cast<int>(winners.size());
+            int rem   = pot % static_cast<int>(winners.size());
+            for (size_t j = 0; j < winners.size(); ++j) {
+                int win = share + (j == 0 ? rem : 0);
+                players[winners[j]]->changeStack(win);
+                std::cout << "Player " << winners[j]
+                          << " wins " << win
+                          << " from pot\n";
+            }
         }
     }
 
