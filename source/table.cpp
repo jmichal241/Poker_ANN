@@ -3,7 +3,7 @@
 #define PLAYER 5
 #define SMALL 5
 #define BIG 10
-#define MAXHANDS 300
+#define MAXHANDS 1000
 
 // In Table class constructor (table.cpp)
 Table::Table() {
@@ -14,9 +14,9 @@ Table::Table() {
     players.push_back(new GPT2bot(STACK_SIZE));  // Add another Kloziobot as the third player
     players[2]->resetHand();  // Reset hand for the third Kloziobot
     players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
-    players[3]->resetHand(); 
+    players[3]->resetHand();
     players.push_back(new Kloziobot(STACK_SIZE));  // Add another Kloziobot as the third player
-    players[4]->resetHand(); 
+    players[4]->resetHand();
 
     players[0]->changeButton(1);  // Assign button to the first player (the first Kloziobot)
     deck.shuffle();  // Shuffle the deck
@@ -39,13 +39,29 @@ void Table::river(){
 void Table::resetboard(){
     for(int i=0; i<PLAYER; i++){
         players[i]->resetHand();
+        players[i]->resetInvestment();
         players[i]->setStack(STACK_SIZE);
-        
+
     }
     pot=0;
+    sidePotAmounts.clear();
+    sidePotEligible.clear();
     for(int i=0; i<5; i++){
         publicCards[i].setNumber(0);
     }
+}
+
+void Table::resetHand(){
+    for(int i=0; i<PLAYER; i++){
+        players[i]->resetHand();
+        players[i]->resetInvestment();
+        players[i]->setAction(NONE);
+    }
+    pot = 0;
+    sidePotAmounts.clear();
+    sidePotEligible.clear();
+    for(int i=0; i<5; i++)
+        publicCards[i].setNumber(0);
 }
 
 void Table::deal(){
@@ -67,6 +83,7 @@ void Table::smallBlind() {
         int blindAmount = min(SMALL, players[temp]->getStack());
         players[temp]->changeStack(-blindAmount);
         players[temp]->changePotAgency(blindAmount);
+        players[temp]->addInvestment(blindAmount);
         pot += blindAmount;
     }
 }
@@ -79,6 +96,7 @@ void Table::bigBlind() {
         int blindAmount = min(BIG, players[temp]->getStack());
         players[temp]->changeStack(-blindAmount);
         players[temp]->changePotAgency(blindAmount);
+        players[temp]->addInvestment(blindAmount);
         pot += blindAmount;
     }
 }
@@ -93,7 +111,11 @@ void Table::passButton(){
 
 void Table::prepareTable(){
     for (int i = 0; i < PLAYER; i++) {
-        players[i]->resetHand();
+        if (players[i]->getStack() == 0) {
+            players[i]->setAction(PASS);  // hm
+        } else {
+            players[i]->setAction(NONE);
+        }
     }
     smallBlind();
     bigBlind();
@@ -101,48 +123,45 @@ void Table::prepareTable(){
     deal();
 }
 
-int Table::allActionMade(){
-    int pass = 0;
-    int check = 0;
-    int call = 0;
-    int raise = 0;
-    Action action = NONE;
-    int highestRaise=0;
-    bool flag=1;
-    for(int i = 0; i < PLAYER; i++){
-        action = players[i]->getAction();
+int Table::allActionMade() {
+    int activePlayers = 0;
+    int completedActions = 0;
 
-        if(action == PASS) pass++;
-        if(action == CHECK) check++;
-        if(action == CALL) call++;
-        if(action == RAISE) raise++;
-    }
-    for(int i = 0; i < PLAYER; i++){
-        if(players[i]->getRaise()>highestRaise){
-            highestRaise=players[i]->getRaise();
+    for (int i = 0; i < PLAYER; i++) {
+        if (players[i]->getStack() > 0 && players[i]->getAction() != PASS) {
+            activePlayers++;
+            if (players[i]->getAction() == ALL_IN || players[i]->getPotAgency() >= raise){
+                completedActions++;
+            }
         }
     }
-    for(int i = 0; i < PLAYER; i++){
-        if(players[i]->getAction()==CALL && players[i]->getPotAgency()!=highestRaise){
-            flag=0;
-            break;
-        }
-    }
-    // cout << highestRaise << endl;
-    // Everyone folded (only pass left)
-    if(pass == PLAYER-1) return 1;  // everyone folded
 
-    // Everyone checked (no one raised or called)
-    if(CALL + pass== PLAYER) return 2;     // everyone checked
+    // Sprawdź opcję dla big blinda
+    int bigBlindIndex = (button + 2) % PLAYER;
+    Player* bigBlind = players[bigBlindIndex];
 
-    // Everyone has called or there was a raise (round complete)
-    if(call + pass == PLAYER ) return 3; // Everyone called, or a raise occurred
+    bool bigBlindShouldAct = (
+        raise == BIG &&
+        bigBlind->getStack() > 0 &&
+        bigBlind->getAction() == CALL &&  // tylko call
+        bigBlind->getPotAgency() == BIG   // zapłacił tylko big blinda
+    );
 
-    if(raise==1 && (call + pass + raise == PLAYER) && flag==1) return 4;
+    if (bigBlindShouldAct) return 0;
 
-    return 0;  // Actions are still in progress
+    return completedActions == activePlayers ? 1 : 0;
 }
-       
+
+// vector<int> Table::getEligiblePlayers() {
+//     vector<int> eligible;
+//     for (int i = 0; i < PLAYER; ++i) {
+//         if (players[i]->getAction() != PASS && players[i]->getInvestment() > 0 && players[i]->getStack() > 0) {
+//             eligible.push_back(i);
+//         }
+//     }
+//     return eligible;
+// }
+
 void Table::GameLoop() {
     resetboard();
     int handCounter = 0;
@@ -154,6 +173,10 @@ void Table::GameLoop() {
     int random_number;
 
     while (true) {
+        resetHand();
+        bool someoneWentAllIn = false;
+        sidePotAmounts.clear();
+        sidePotEligible.clear();
         if (handCounter%500==0){
             resetboard();
         }
@@ -179,7 +202,7 @@ void Table::GameLoop() {
             int currentPlayerIndex = (counter) % PLAYER;
             Player* currentPlayer = players[currentPlayerIndex];
 
-            if (currentPlayer->getAction() == PASS) {
+            if (currentPlayer->getAction() == PASS || currentPlayer->getStack() == 0) {
                 counter++;
                 continue;
             }
@@ -192,14 +215,19 @@ void Table::GameLoop() {
 
                 // you have to have enough money and cant raise by less than BIG
                 if (newRaise >= raise + BIG && currentPlayer->getStack() >= toPay) {
+                    // valid raise
                     raise = newRaise;
                     currentPlayer->changeStack(-toPay);
                     pot += toPay;
                     currentPlayer->changePotAgency(raise);
                     currentPlayer->setAction(RAISE);
+                    currentPlayer->addInvestment(toPay);
                     cout << "Player " << currentPlayerIndex << " raised to " << raise << endl;
-                } else { //if we cant raise we call
+                } else if (currentPlayer->getStack() >= (raise - currentPlayer->getPotAgency())) {
+                    // treat as CALL if raise too small but player has enough to call
                     tempAction = CALL;
+                } else {
+                    tempAction = ALL_IN;
                 }
             }
 
@@ -211,13 +239,38 @@ void Table::GameLoop() {
                     pot += callAmount;
                     currentPlayer->changePotAgency(raise);
                     currentPlayer->setAction(CALL);
+                    currentPlayer->addInvestment(callAmount);
                     cout << "Player " << currentPlayerIndex << " called " << raise << endl;
-                } else { //if not enough money we pass
+                } else { //if not enough money we all in
+                    tempAction = ALL_IN;
+                }
+            }
+
+            if (tempAction == ALL_IN) {
+                if (currentPlayer->getStack() > 0) {
+                    int allInAmount = currentPlayer->getStack();
+                    int totalInvestment = currentPlayer->getPotAgency() + allInAmount;
+
+                    pot += allInAmount;
+                    currentPlayer->changePotAgency(totalInvestment);
+                    currentPlayer->addInvestment(allInAmount);
+                    currentPlayer->changeStack(-allInAmount);
+
+                    if (totalInvestment > raise) {
+                        raise = totalInvestment;
+                    }
+
+                    currentPlayer->setAction(ALL_IN);
+                    someoneWentAllIn = true;
+
+                    cout << "Player " << currentPlayerIndex << " goes ALL-IN with " << allInAmount << endl;
+                }
+                else { // if not enough money we pass
                     tempAction = PASS;
                 }
             }
 
-            // PASS (jeden uniwersalny blok)
+            // PASS
             if (tempAction == PASS) {
                 currentPlayer->setAction(PASS);
                 cout << "Player " << currentPlayerIndex << " folded" << endl;
@@ -226,37 +279,117 @@ void Table::GameLoop() {
             counter++;
             registerAction(currentPlayer->getAction(), raise, currentPlayerIndex, handCounter);
         }
-        // Handle community cards (flop, turn, river)
-        status = FLOP;
-        flop();
-        status = TURN;
-        turn();
-        status = RIVER;
-        river();
 
-        // Determine the winners and display them
-        winners = defineWinner();
-        cout << "The winners are players: ";
-        for (int winner : winners) {
-            cout << "Player " << winner << " ";
+        int originalPot = pot;
+    if (someoneWentAllIn) {
+    // 1) Zbierz unikalne poziomy inwestycji i posortuj rosnąco
+    std::set<int> uniqueLevels;
+    for (int i = 0; i < PLAYER; ++i) {
+        if (players[i]->getAction() != PASS)
+            uniqueLevels.insert(players[i]->getInvestment());
+    }
+    std::vector<int> levels(uniqueLevels.begin(), uniqueLevels.end());
+    std::sort(levels.begin(), levels.end());
+
+    int prevLevel = 0;
+    int mainLevel = levels[0];
+    int mainPotAmt = 0;
+    std::vector<int> mainContrib;
+
+    // 2) Oblicz main pot (dla najniższego poziomu)
+    for (int i = 0; i < PLAYER; ++i) {
+        if (players[i]->getAction() != PASS) {
+            int inv = players[i]->getInvestment();
+            if (inv >= mainLevel) {
+                mainPotAmt += (mainLevel - prevLevel);
+                mainContrib.push_back(i);
+            }
         }
-        cout << endl;
-        registerWin(winners,handCounter);
+    }
+    prevLevel = mainLevel;
 
-        // Distribute the pot
+    // 3) Oblicz każdy side pot
+        sidePotEligible.clear();
+        sidePotAmounts.clear();
+    for (size_t lvlIdx = 1; lvlIdx < levels.size(); ++lvlIdx) {
+        int lvl = levels[lvlIdx];
+        int sideAmt = 0;
+        std::vector<int> contrib;
+        for (int i = 0; i < PLAYER; ++i) {
+            if (players[i]->getAction() != PASS && players[i]->getInvestment() >= lvl) {
+                sideAmt += (lvl - prevLevel);
+                contrib.push_back(i);
+            }
+        }
+        prevLevel = lvl;
+        if (!contrib.empty()) {
+            sidePotEligible.push_back(contrib);
+            sidePotAmounts.push_back(sideAmt);
+        }
+    }
+
+    // 4) (Opcjonalnie) weryfikacja sumy:
+    {
+        int totalSide = std::accumulate(sidePotAmounts.begin(), sidePotAmounts.end(), 0);
+        if (mainPotAmt + totalSide != originalPot) {
+            std::cerr << "!!! POT CALC MISMATCH !!! original=" << originalPot
+                      << " main=" << mainPotAmt
+                      << " sideSum=" << totalSide << std::endl;
+        }
+    }
+
+    // 5) Pay main pot
+    {
+        auto winners = defineWinnerAmong(mainContrib);
+        int share = mainPotAmt / winners.size();
+        int rem   = mainPotAmt % winners.size();
+        for (size_t j = 0; j < winners.size(); ++j) {
+            int win = share + (j == 0 ? rem : 0);
+            players[winners[j]]->changeStack(win);
+            std::cout << "Player " << winners[j]
+                      << " wins " << win << " from MAIN pot\n";
+        }
+    }
+
+    // 6) pay side pot
+    for (size_t sp = 0; sp < sidePotAmounts.size(); ++sp) {
+        auto winners = defineWinnerAmong(sidePotEligible[sp]);
+        int sideAmt = sidePotAmounts[sp];
+        int share   = sideAmt / winners.size();
+        int rem     = sideAmt % winners.size();
+        for (size_t j = 0; j < winners.size(); ++j) {
+            int win = share + (j == 0 ? rem : 0);
+            players[winners[j]]->changeStack(win);
+                std::cout << "Player " << winners[j]
+                      << " wins " << win << " from SIDE pot " << sp << "\n";
+            }
+        }
+    } else {
+        // 6) if no all-ins
+        std::vector<int> contenders;
+        for (int i = 0; i < PLAYER; ++i) {
+            if (players[i]->getAction() != PASS) {
+                contenders.push_back(i);
+            }
+        }
+        auto winners = defineWinnerAmong(contenders);
         int share = pot / winners.size();
-        int remainder = pot % winners.size();
-
-        for (size_t i = 0; i < winners.size(); ++i) {
-            int winnings = share;
-            if (i == 0) winnings += remainder; // The first winner gets the remainder
-            players[winners[i]]->changeStack(winnings);
+        int rem   = pot % winners.size();
+        for (size_t j = 0; j < winners.size(); ++j) {
+            int win = share + (j == 0 ? rem : 0);
+            players[winners[j]]->changeStack(win);
+            std::cout << "Player " << winners[j]
+                      << " wins " << win << " from pot\n";
         }
+    }
+
+        registerWin(winners, handCounter);
 
         cout << "Pot (" << pot << ") has been distributed among the winners." << endl;
+        pot = 0;
         displayPlayers();
         displayBoard();
-        // Check if only one player has enough stack to continue
+
         int playerCounter = 0;
         for (int i = 0; i < PLAYER; i++) {
             if (players[i]->getStack() <= 20) {
@@ -264,20 +397,53 @@ void Table::GameLoop() {
             }
         }
 
-        // End the game if only one player has enough stack to continue
         if (playerCounter == PLAYER - 1) {
             cout << "Hand counter is: " << handCounter << endl;
             break;
         }
 
         passButton();
-
-
-
         handCounter++;
     }
 
     cout << "Game ended after " << handCounter << " hands." << endl;
+}
+
+
+vector<int> Table::defineWinnerAmong(const vector<int>& eligible) {
+    vector<int> winners;
+    int bestHandValue = -1;
+    vector<vector<int>> handsResults(PLAYER);
+
+    for (int i : eligible) {
+        handsResults[i] = defineHand(*players[i]);
+    }
+
+    for (int i : eligible) {
+        vector<int> hand = handsResults[i];
+        int value = hand[0];
+
+        if (winners.empty()) {
+            bestHandValue = value;
+            winners.push_back(i);
+        } else if (value > bestHandValue) {
+            bestHandValue = value;
+            winners = {i};
+        } else if (value == bestHandValue) {
+            for (int j = 1; j < hand.size(); j++) {
+                if (hand[j] > handsResults[winners[0]][j]) {
+                    winners = {i};
+                    break;
+                } else if (hand[j] < handsResults[winners[0]][j]) {
+                    break;
+                } else if (j == hand.size() - 1) {
+                    winners.push_back(i);  // tie
+                }
+            }
+        }
+    }
+
+    return winners;
 }
 
 void Table::displayBoard(){
@@ -424,20 +590,20 @@ vector<int> Table::defineHand(Player player) {
                 bestHand.push_back(card);
             }
         }
-    
+
         if (bestHand.size() != 5) return {0, 0, 0, 0, 0, 0}; // Royal Flush musi mieć 5 kart
-    
+
         sort(bestHand.begin(), bestHand.end(), [](const Card& a, const Card& b) {
             return a.getNumber() < b.getNumber();
         });
-    
+
         vector<int> result = {9}; // Royal Flush
         for (const auto& card : bestHand) result.push_back(card.getNumber());
-    
+
         return result; // guaranteed to be size 6
     }
-    
-    
+
+
     else if (isStraightFlush) {
         vector<Card> straightFlushCards;
         for (const auto& card : cards) {
@@ -445,11 +611,11 @@ vector<int> Table::defineHand(Player player) {
                 straightFlushCards.push_back(card);
             }
         }
-    
+
         sort(straightFlushCards.begin(), straightFlushCards.end(), [](const Card& a, const Card& b) {
             return a.getNumber() < b.getNumber();
         });
-    
+
         // Usuwamy duplikaty numerów (np. dwie 10-ki w tym samym kolorze)
         vector<Card> uniqueCards;
         for (const auto& card : straightFlushCards) {
@@ -457,7 +623,7 @@ vector<int> Table::defineHand(Player player) {
                 uniqueCards.push_back(card);
             }
         }
-    
+
         for (int i = 0; i <= uniqueCards.size() - 5; ++i) {
             bool isStraight = true;
             for (int j = i; j < i + 4; ++j) {
@@ -466,10 +632,10 @@ vector<int> Table::defineHand(Player player) {
                     break;
                 }
             }
-    
+
             if (isStraight) {
                 bestHand = vector<Card>(uniqueCards.begin() + i, uniqueCards.begin() + i + 5);
-    
+
                 vector<int> result = {8}; // Straight Flush
                 for (const auto& card : bestHand) {
                     result.push_back(card.getNumber());
@@ -478,7 +644,7 @@ vector<int> Table::defineHand(Player player) {
             }
         }
     }
-    
+
 
     if (isFourOfKind) {
         int fourKindValue = -1;
@@ -488,13 +654,13 @@ vector<int> Table::defineHand(Player player) {
                 break;
             }
         }
-    
+
         for (const auto& card : cards) {
             if (card.getNumber() == fourKindValue) {
                 bestHand.push_back(card);
             }
         }
-    
+
         // Find highest kicker
         Card kicker;
         bool found = false;
@@ -506,33 +672,33 @@ vector<int> Table::defineHand(Player player) {
                 }
             }
         }
-    
+
         if (found) {
             bestHand.push_back(kicker);
         }
-    
+
         // Sort the four of a kind part
         sort(bestHand.begin(), bestHand.begin() + 4, [](const Card& a, const Card& b) {
             return a.getNumber() < b.getNumber();
         });
-    
+
         vector<int> result = {7};
         for (const auto& card : bestHand) {
             result.push_back(card.getNumber());
         }
-    
+
         // Fill with 0 if needed (shouldn't happen but just in case)
         while (result.size() < 6) {
             result.push_back(0);
         }
-    
+
         return result;
     }
-    
+
     if (isFullHouse) {
         vector<Card> threeOfAKind, pairCards;
         int threeVal = -1, pairVal = -1;
-    
+
         for (int i = 14; i >= 2; i--) {
             if (counts[i] == 3 && threeVal == -1) {
                 threeVal = i;
@@ -550,71 +716,71 @@ vector<int> Table::defineHand(Player player) {
                 }
             }
         }
-    
+
         if (threeOfAKind.size() == 3 && pairCards.size() == 2) {
             bestHand.insert(bestHand.end(), threeOfAKind.begin(), threeOfAKind.end());
             bestHand.insert(bestHand.end(), pairCards.begin(), pairCards.end());
-    
+
             vector<int> result = {6};
             for (const auto& card : bestHand) {
                 result.push_back(card.getNumber());
             }
-    
+
             // Dla pewności dopełniamy do 6
             while (result.size() < 6) {
                 result.push_back(0);
             }
-    
+
             return result;
         }
     }
-    
-    
+
+
     else if (isFlush) {
         vector<Card> flushCards;
-    
+
         // Group cards of the flush colour
         for (const auto& card : cards) {
             if (card.getColour() == flushColour) {
                 flushCards.push_back(card);
             }
         }
-    
+
         // If we have at least 5 cards of the same suit
         if (flushCards.size() >= 5) {
             // Sort cards in descending order
             sort(flushCards.begin(), flushCards.end(), [](const Card& a, const Card& b) {
                 return a.getNumber() > b.getNumber();
             });
-    
+
             // Select the 5 strongest cards
             bestHand = vector<Card>(flushCards.begin(), flushCards.begin() + 5);
-    
+
             // Build result vector
             vector<int> result = {5};
             for (const auto& card : bestHand) {
                 result.push_back(card.getNumber());
             }
-    
+
             return result;
         }
     }
-    
+
     else if (isStraight) {
         // Zbierz unikalne wartości kart
         set<int> uniqueValues;
         for (const auto& card : cards) {
             uniqueValues.insert(card.getNumber());
         }
-    
+
         // Dodaj asa jako 1, jeśli występuje 14 (A), do obsługi A-2-3-4-5
         if (uniqueValues.count(14)) {
             uniqueValues.insert(1);
         }
-    
+
         // Zamień na wektor i posortuj rosnąco
         vector<int> sortedValues(uniqueValues.begin(), uniqueValues.end());
-    
+
         // Szukaj najlepszego straighta
         vector<int> bestStraight;
         for (int i = sortedValues.size() - 1; i >= 4; --i) {
@@ -633,20 +799,20 @@ vector<int> Table::defineHand(Player player) {
                 break;
             }
         }
-    
+
         if (!bestStraight.empty()) {
             vector<int> result = {4};
             result.insert(result.end(), bestStraight.begin(), bestStraight.end());
             return result;
         }
     }
-    
-    
+
+
     if (isThreeOfKind) {
         int threeKindValue = -1;
         vector<Card> kickerCards;
         bestHand.clear();
-    
+
         for (int i = 14; i >= 2; i--) {
             if (counts[i] == 3) {
                 threeKindValue = i;
@@ -656,35 +822,35 @@ vector<int> Table::defineHand(Player player) {
                 break;
             }
         }
-    
+
         for (const auto& card : cards) {
             if (card.getNumber() != threeKindValue) {
                 kickerCards.push_back(card);
             }
         }
-    
+
         sort(kickerCards.begin(), kickerCards.end(), [](const Card& a, const Card& b) {
             return a.getNumber() > b.getNumber();
         });
-    
+
         bestHand.push_back(kickerCards[0]);
         bestHand.push_back(kickerCards[1]);
-    
+
         vector<int> result = {3};
         for (const auto& card : bestHand) result.push_back(card.getNumber());
         return result;
     }
-    
+
     else if (isTwoPair) {
         vector<int> pairValues;
         bestHand.clear();
-    
+
         for (int i = 14; i >= 2; i--) {
             if (counts[i] == 2) {
                 pairValues.push_back(i);
             }
         }
-    
+
         if (pairValues.size() >= 2) {
             for (int i = 0; i < 2; ++i) {
                 for (const auto& card : cards) {
@@ -693,7 +859,7 @@ vector<int> Table::defineHand(Player player) {
                     }
                 }
             }
-    
+
             // Add kicker
             vector<Card> kickers;
             for (const auto& card : cards) {
@@ -701,23 +867,23 @@ vector<int> Table::defineHand(Player player) {
                     kickers.push_back(card);
                 }
             }
-    
+
             sort(kickers.begin(), kickers.end(), [](const Card& a, const Card& b) {
                 return a.getNumber() > b.getNumber();
             });
-    
+
             bestHand.push_back(kickers[0]);
-    
+
             vector<int> result = {2};
             for (const auto& card : bestHand) result.push_back(card.getNumber());
             return result;
         }
     }
-    
+
     else if (isOnePair) {
         int pairValue = -1;
         bestHand.clear();
-    
+
         for (int i = 14; i >= 2; i--) {
             if (counts[i] == 2) {
                 pairValue = i;
@@ -727,109 +893,39 @@ vector<int> Table::defineHand(Player player) {
                 break;
             }
         }
-    
+
         vector<Card> kickers;
         for (const auto& card : cards) {
             if (card.getNumber() != pairValue) {
                 kickers.push_back(card);
             }
         }
-    
+
         sort(kickers.begin(), kickers.end(), [](const Card& a, const Card& b) {
             return a.getNumber() > b.getNumber();
         });
-    
+
         bestHand.push_back(kickers[0]);
         bestHand.push_back(kickers[1]);
         bestHand.push_back(kickers[2]);
-    
+
         vector<int> result = {1};
         for (const auto& card : bestHand) result.push_back(card.getNumber());
         return result;
     }
-    
+
     // High card
     vector<Card> highCardHand = cards;
     sort(highCardHand.begin(), highCardHand.end(), [](const Card& a, const Card& b) {
         return a.getNumber() > b.getNumber();
     });
     highCardHand.resize(5);
-    
+
     vector<int> result = {0};
     for (const auto& card : highCardHand) result.push_back(card.getNumber());
     return result;
     }
 
-vector<int> Table::defineWinner() {
-    vector<int> winners;
-    int bestHandValue = -1;  // Najlepsza wartość ręki
-
-    vector<vector<int>> handsResults;
-    for (int i = 0; i < PLAYER; i++) {
-        handsResults.push_back(defineHand(*players[i]));
-    }
-
-    cout << "Wyniki rąk graczy:" << endl;
-    for (int i = 0; i < PLAYER; i++) {
-        // cout << "Gracz " << i ;
-        // if (players[i]->getAction() == PASS) {
-        //      cout << " (FOLD)";
-        // }
-        // cout << ": ";
-        // for (int card : handsResults[i]) {
-        //     cout << card << " ";
-        // }
-        // cout << endl;
-    }
-
-    for (int i = 0; i < PLAYER; i++) {
-        if (players[i]->getAction() == PASS) continue;  // Pomiń graczy, którzy spasowali
-
-        vector<int> hand = handsResults[i];
-        int handValue = hand[0];
-
-        // cout << "Porównuję rękę gracza " << i << " (Typ: " << handValue << "): ";
-        for (int card : hand) {
-            // cout << card << " ";
-        }
-        cout << endl;
-
-        if (winners.empty()) {
-            bestHandValue = handValue;
-            winners.push_back(i);
-            // cout << "Nowy zwycięzca: Gracz " << i << endl;
-        } else if (handValue > bestHandValue) {
-            bestHandValue = handValue;
-            winners.clear();
-            winners.push_back(i);
-            // cout << "Nowy zwycięzca: Gracz " << i << endl;
-        } else if (handValue == bestHandValue) {
-            bool isBetter = false;
-            bool isEqual = true;
-            for (int j = 1; j < hand.size(); j++) {
-                if (hand[j] > handsResults[winners[0]][j]) {
-                    isBetter = true;
-                    isEqual = false;
-                    break;
-                } else if (hand[j] < handsResults[winners[0]][j]) {
-                    isEqual = false;
-                    break;
-                }
-            }
-
-            if (isBetter) {
-                winners.clear();
-                winners.push_back(i);
-                // cout << "Nowy zwycięzca: Gracz " << i << endl;
-            } else if (isEqual) {
-                winners.push_back(i); // Remis
-                // cout << "Remis! Dodano gracza " << i << " do listy zwycięzców." << endl;
-            }
-        }
-    }
-
-    return winners;
-}
    
 void Table::createHeader(int handNumber, int playerNum){
     string fileName;  

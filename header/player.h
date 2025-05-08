@@ -9,6 +9,7 @@ enum Action{
     CALL,
     PASS,
     RAISE,
+    ALL_IN,
     NONE
 };
 
@@ -20,6 +21,7 @@ protected:
     int Raise=0;    //raise number
     Action action;
     int potAgency=0;
+    int investment = 0; // for all in logic
 public:
     Player(int);
     void display();
@@ -39,6 +41,10 @@ public:
     Card returnCard(int);
     void changePotAgency(int);
     int getPotAgency();
+
+    void addInvestment(int amount);
+    void resetInvestment();
+    int getInvestment();
 
     //akcje
     void check();

@@ -30,7 +30,7 @@ Action GPT1bot::makeAction(int raiseMoney, int pot, int button) {
         (rank1 == 12 && rank2 >= 8) || (rank2 == 12 && rank1 >= 8) || // AK, AQ
         (rank1 == 13 && rank2 == 12) || (rank2 == 13 && rank1 == 12)) { // KQ
         // Jeśli mamy mocną rękę, podnosimy stawkę
-        Raise = std::max(raiseMoney * 2, 10);  // Podwajamy poprzednie podbicie (minimalnie 10)
+        Raise = std::max(raiseMoney * 2, BIG);  // Podwajamy poprzednie podbicie (minimalnie 10)
         setAction(RAISE);
         return RAISE;
     }

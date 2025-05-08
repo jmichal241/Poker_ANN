@@ -6,7 +6,7 @@ Player::Player(int initialStack) : stack(initialStack), action(NONE) {
 }
 
 void Player::display(){
-    
+
     cout << "stack: " << stack << " button: " << button << " HAND: ";
     hand[0].display();
     hand[1].display();
@@ -17,7 +17,7 @@ void Player::getCard(Card card){
     if(hand[0].getNumber()==0){
         hand[0]=card;
     }
-    else 
+    else
         hand[1]=card;
 }
 
@@ -40,7 +40,7 @@ void Player::changeStack(int change){
 
 void Player::setStack(int newStack){
     stack = newStack;
-}   
+}
 
 void Player::changeButton(bool change){
     button = change;
@@ -85,7 +85,7 @@ Action Player::makeAction(int raiseMoney, int pot, int button){
     //     cout << "Option 2 - Fold" << endl;
     //     cout << "Option 3 - Raise" << endl;
     //     cin >> x;
-        
+
     //     if(x>=0 && x<4){
     //         cout << "Correct number" << endl;
     //         if(x==0){
@@ -115,8 +115,8 @@ Action Player::makeAction(int raiseMoney, int pot, int button){
 Card Player::returnCard(int index){
     if(index==0)
         return hand[0];
-    
-    else 
+
+    else
         return hand[1];
 }
 
@@ -130,4 +130,16 @@ void Player::changePotAgency(int money){
 
 int Player::getPotAgency(){
     return potAgency;
+}
+
+void Player::addInvestment(int amount) {
+    investment += amount;
+}
+
+void Player::resetInvestment() {
+    investment = 0;
+}
+
+int Player::getInvestment() {
+    return investment;
 }

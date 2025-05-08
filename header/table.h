@@ -33,10 +33,14 @@ private:
     int button=0;
     int raise=0;
     Card publicCards[5];
+    std::vector<int> sidePotAmounts;
+    std::vector<std::vector<int>> sidePotEligible;
+
 public:
     Table();
     void GameLoop();
     void resetboard();
+    void resetHand();
     
     //Cards operations
     void deal();        //Cards for players
@@ -56,10 +60,12 @@ public:
     int getPot();
     int getRaise();
     int getButton();
+
  
     //Methods to define winners
     vector<int> defineHand(Player);   //check how strong is your hand
-    vector<int> defineWinner();       //define who wins this hand
+    vector<int> defineWinnerAmong(const vector<int>& eligible); // define who wins pot/side pot
+    // vector<int> getEligiblePlayers();
 
     //Debug functions
     void displayBoard();
